@@ -3,7 +3,7 @@
 
 int main(int argc, char ** argv)
 {
-    initGame("Space invaders", 960, 800);
+    initGame("Space invaders", 960, 540);
 
     Uint64 lastTime = SDL_GetPerformanceCounter();
     while (isRunning())
@@ -25,8 +25,6 @@ int main(int argc, char ** argv)
 
     }
     clearGame();
-
-    printf("test");
 
     return 0;
 }

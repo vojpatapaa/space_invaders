@@ -6,7 +6,9 @@
 
 SDL_Texture * createTextureFromImage(const char * path)
 {
-    SDL_Texture * texture = IMG_LoadTexture(getRenderer(), path);
+    SDL_Surface * surface = IMG_Load(path);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(getRenderer(), surface);
+    SDL_FreeSurface(surface);
     return texture;
 }
 

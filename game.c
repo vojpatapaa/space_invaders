@@ -1,7 +1,3 @@
-//
-// Created by Intel on 11/12/2025.
-//
-
 #define SCREEN_WIDTH 960
 #define SCREEN_HEIGHT 540
 
@@ -15,14 +11,14 @@ SDL_Window * window;
 SDL_Renderer * renderer;
 SDL_Texture * canvas;
 
-const int screenHeight = SCREEN_HEIGHT;
-const int screenWidth = SCREEN_WIDTH;
-
 int running;
 
 double desiredMaxMilPerFrame;
 double deltaTime;
 int desiredFPS;
+
+Tank * playerTank;
+
 
 void setDesiredFPS(int fps)
 {
@@ -58,6 +54,16 @@ void setRunning(int newRunning)
 int isRunning()
 {
     return running;
+}
+
+int getCanvasWidth()
+{
+    return CANVAS_WIDTH;
+}
+
+int getCanvasHeight()
+{
+    return CANVAS_HEIGHT;
 }
 
 SDL_Renderer * getRenderer()
@@ -133,6 +139,11 @@ void initGame(const char *windowLabel, int winWidth, int winHeight)
     }
 
     running = 1;
+
+    initTankModule();
+    playerTank = createTank(CANVAS_WIDTH/2 - (13.0/2.5), CANVAS_HEIGHT-(8.0 * 2.5)-25, 13.0 * 2.5, 8.0 * 2.5, 700);
+
+
 }
 
 void handleInput()
@@ -147,6 +158,10 @@ void handleInput()
                 setRunning(0);
                 break;
 
+            case SDL_MOUSEBUTTONDOWN:
+                    printf("%d\n", event.button.clicks);
+                    break;
+
             default:
                 break;
         }
@@ -155,7 +170,7 @@ void handleInput()
 
 void update()
 {
-
+    updateTank(playerTank);
 }
 
 void render()
@@ -163,10 +178,11 @@ void render()
     SDL_SetRenderTarget(renderer, canvas);
     SDL_RenderClear(renderer);
     /*tady bude rada na renderCopy*/
+    renderTank(playerTank);
 
     /*Jenom Test*/
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_Rect rect = {200, 200, 100, 150};
+    SDL_Rect rect = {200, 200, 100, 100};
     SDL_RenderFillRect(renderer, &rect);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     /*Jenom test*/
@@ -180,12 +196,16 @@ void render()
 
 void clearGame()
 {
-    SDL_DestroyWindow(window);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyTexture(canvas);
+    destroyTank(playerTank);
+    quitTankModule();
 
-    SDL_Quit();
-    IMG_Quit();
-    TTF_Quit();
+    SDL_DestroyTexture(canvas);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+
+    Mix_CloseAudio();
     Mix_Quit();
+    TTF_Quit();
+    IMG_Quit();
+    SDL_Quit();
 }

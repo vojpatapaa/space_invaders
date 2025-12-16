@@ -5,7 +5,8 @@ set(CMAKE_C_STANDARD 23)
 
 add_executable(space_invaders main.c game.c
         textureManager.c
-        textureManager.h)
+        textureManager.h
+        tank.c)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_options(space_invaders PRIVATE -fsanitize=address)

@@ -6,7 +6,7 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
-#include "textureManager.h"
+#include "tank.h"
 
 void setDesiredFPS(int fps);
 int getDesiredFPS();
@@ -16,6 +16,9 @@ double getDeltaTime();
 
 void setRunning(int newRunning);
 int isRunning();
+
+int getCanvasWidth();
+int getCanvasHeight();
 
 SDL_Renderer * getRenderer();
 SDL_Window * get_window();
