@@ -7,6 +7,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include "tank.h"
+#include "bubakGroup.h"
 
 void setDesiredFPS(int fps);
 int getDesiredFPS();

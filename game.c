@@ -17,7 +17,9 @@ double desiredMaxMilPerFrame;
 double deltaTime;
 int desiredFPS;
 
-Tank * playerTank;
+/*Game objects*/
+Tank playerTank;
+BubakGroup enemyArmy;
 
 
 void setDesiredFPS(int fps)
@@ -143,6 +145,10 @@ void initGame(const char *windowLabel, int winWidth, int winHeight)
     initTankModule();
     playerTank = createTank(CANVAS_WIDTH/2 - (13.0/2.5), CANVAS_HEIGHT-(8.0 * 2.5)-25, 13.0 * 2.5, 8.0 * 2.5, 700);
 
+    initBubakModule();
+    enemyArmy = createBubakGroup(1000, 5000, 10, 10, 10);
+    
+
 
 }
 
@@ -170,15 +176,18 @@ void handleInput()
 
 void update()
 {
-    updateTank(playerTank);
+    updateTank(&playerTank);
+    updateBubakGroup(&enemyArmy);
 }
 
 void render()
 {
     SDL_SetRenderTarget(renderer, canvas);
     SDL_RenderClear(renderer);
+
     /*tady bude rada na renderCopy*/
-    renderTank(playerTank);
+    renderTank(&playerTank);
+    renderBubakGroup(&enemyArmy);
 
     /*Jenom Test*/
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
@@ -196,7 +205,7 @@ void render()
 
 void clearGame()
 {
-    destroyTank(playerTank);
+    quitBubakModule();
     quitTankModule();
 
     SDL_DestroyTexture(canvas);

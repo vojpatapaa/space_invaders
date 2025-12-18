@@ -23,12 +23,10 @@ typedef struct
 void initTankModule();
 void quitTankModule();
 
-Tank * createTank(double x, double y, double tankWidth, double tankHeight, int miliShootDelay);
+Tank createTank(double x, double y, double tankWidth, double tankHeight, int miliShootDelay);
 
 void updateTank(Tank * tank);
 void renderTank(Tank * tank);
-
-void destroyTank(Tank * tank);
 
 
 

@@ -15,22 +15,18 @@ void quitTankModule()
     SDL_DestroyTexture(tankTexture);
 }
 
-Tank * createTank(double x, double y, double tankWidth, double tankHeight, int miliShootDelay)
+Tank createTank(double x, double y, double tankWidth, double tankHeight, int miliShootDelay)
 {
-    Tank * tank = (Tank *)malloc(sizeof(Tank));
-    if(tank == NULL)
-    {
-        return NULL;
-    }
+    Tank tank;
 
-    tank->DelayTime = miliShootDelay;
-    tank->lastShootTime = 0;
+    tank.DelayTime = miliShootDelay;
+    tank.lastShootTime = 0;
 
-    tank->xPos = x;
-    tank->yPos = y;
-    tank->width = tankWidth;
-    tank->height = tankHeight;
-    tank->activeInput = 1;
+    tank.xPos = x;
+    tank.yPos = y;
+    tank.width = tankWidth;
+    tank.height = tankHeight;
+    tank.activeInput = 1;
 
 
     return tank;
@@ -82,12 +78,4 @@ void renderTank(Tank * tank)
     dst.h = (int)tank->height;
 
     SDL_RenderCopy(getRenderer(), tankTexture, NULL, &dst);
-}
-
-void destroyTank(Tank * tank)
-{
-    if(tank != NULL)
-    {
-        free(tank);
-    }
 }
