@@ -18,7 +18,7 @@
 
 typedef struct
 {
-    Bubak bubaks;
+    Bubak bubaks[BUBAK_ROWS][BUBAK_COLUMNS];
     int minDelay;
     int maxDelay;
     int currentDelay;

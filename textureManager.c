@@ -7,8 +7,13 @@
 SDL_Texture * createTextureFromImage(const char * path)
 {
     SDL_Surface * surface = IMG_Load(path);
+    if (surface == NULL)
+    {
+        printf("Could not find load the image: %s\n", path);
+    }
     SDL_Texture * texture = SDL_CreateTextureFromSurface(getRenderer(), surface);
     SDL_FreeSurface(surface);
+
     return texture;
 }
 
@@ -30,6 +35,7 @@ SpriteSheet * createSpriteSheet(const char * path, int boxWidthh, int boxHeightt
     spriteSheet->texture = createTextureFromImage(path);
     if(spriteSheet->texture == NULL)
     {
+        printf("Could not find load the image: %s\n", path);
         free(spriteSheet);
         return NULL;
     }

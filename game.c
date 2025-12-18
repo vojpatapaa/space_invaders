@@ -5,6 +5,8 @@
 #define CANVAS_HEIGHT 540
 
 #include "game.h"
+#include "tank.h"
+#include "bubakGroup.h"
 
 
 SDL_Window * window;
@@ -20,6 +22,7 @@ int desiredFPS;
 /*Game objects*/
 Tank playerTank;
 BubakGroup enemyArmy;
+Mix_Music * chopin;
 
 
 void setDesiredFPS(int fps)
@@ -146,7 +149,9 @@ void initGame(const char *windowLabel, int winWidth, int winHeight)
     playerTank = createTank(CANVAS_WIDTH/2 - (13.0/2.5), CANVAS_HEIGHT-(8.0 * 2.5)-25, 13.0 * 2.5, 8.0 * 2.5, 700);
 
     initBubakModule();
-    enemyArmy = createBubakGroup(1000, 5000, 10, 10, 10);
+    enemyArmy = createBubakGroup(1000, 5000, 10, 35, 30);
+
+    chopin = Mix_LoadMUS("assets/tank/sfx/chopin.wav");
     
 
 
@@ -165,7 +170,7 @@ void handleInput()
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
-                    printf("%d\n", event.button.clicks);
+                    Mix_FadeInMusicPos(chopin, 0, 10000, 5.0);
                     break;
 
             default:
@@ -188,13 +193,6 @@ void render()
     /*tady bude rada na renderCopy*/
     renderTank(&playerTank);
     renderBubakGroup(&enemyArmy);
-
-    /*Jenom Test*/
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_Rect rect = {200, 200, 100, 100};
-    SDL_RenderFillRect(renderer, &rect);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    /*Jenom test*/
 
     SDL_SetRenderTarget(renderer, NULL);
     SDL_RenderClear(renderer);
