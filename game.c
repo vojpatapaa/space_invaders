@@ -12,6 +12,7 @@
 SDL_Window * window;
 SDL_Renderer * renderer;
 SDL_Texture * canvas;
+SDL_Color background;
 
 int running;
 
@@ -81,10 +82,10 @@ SDL_Window * get_window()
     return window;
 }
 
-void initGame(const char *windowLabel, int winWidth, int winHeight)
+void initGame(const char * windowLabel, int winWidth, int winHeight, int initialFPS, SDL_Color backgroundColor)
 {
 
-    if (SDL_Init(SDL_INIT_VIDEO))
+    if (SDL_Init(SDL_INIT_EVERYTHING))
     {
         printf("%s\n", SDL_GetError());
         exit(-1);
@@ -120,6 +121,9 @@ void initGame(const char *windowLabel, int winWidth, int winHeight)
     {
         printf("%s\n", SDL_GetError());
         SDL_Quit();
+        IMG_Quit();
+        TTF_Quit();
+        Mix_Quit();
         exit(-1);
     }
 
@@ -127,20 +131,28 @@ void initGame(const char *windowLabel, int winWidth, int winHeight)
     if (renderer == NULL)
     {
         printf("%s\n", SDL_GetError());
-        SDL_Quit();
-        exit(-1);
-    }
-
-    setDesiredFPS(60);
-
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    canvas = createCanvasTexture(CANVAS_WIDTH, CANVAS_HEIGHT);
-    if (canvas == NULL)
-    {
+        SDL_DestroyWindow(window);
         SDL_Quit();
         IMG_Quit();
         TTF_Quit();
         Mix_Quit();
+        exit(-1);
+    }
+
+    setDesiredFPS(initialFPS);
+
+    background = backgroundColor;
+    SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b, background.a);
+    canvas = createCanvasTexture(CANVAS_WIDTH, CANVAS_HEIGHT);
+    if (canvas == NULL)
+    {
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        IMG_Quit();
+        TTF_Quit();
+        Mix_Quit();
+        exit(-1);
     }
 
     running = 1;
@@ -149,7 +161,7 @@ void initGame(const char *windowLabel, int winWidth, int winHeight)
     playerTank = createTank(CANVAS_WIDTH/2 - (13.0/2.5), CANVAS_HEIGHT-(8.0 * 2.5)-25, 13.0 * 2.5, 8.0 * 2.5, 700);
 
     initBubakModule();
-    enemyArmy = createBubakGroup(1000, 5000, 10, 35, 30);
+    enemyArmy = createBubakGroup(200, 800, 10, 35, 30);
 
     chopin = Mix_LoadMUS("assets/tank/sfx/chopin.wav");
     
@@ -173,10 +185,10 @@ void handleInput()
                     Mix_FadeInMusicPos(chopin, 0, 10000, 5.0);
                     break;
 
-            default:
-                break;
         }
     }
+    
+
 }
 
 void update()
@@ -187,6 +199,7 @@ void update()
 
 void render()
 {
+    SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b, background.a);
     SDL_SetRenderTarget(renderer, canvas);
     SDL_RenderClear(renderer);
 
@@ -203,6 +216,9 @@ void render()
 
 void clearGame()
 {
+
+    Mix_FreeMusic(chopin);
+
     quitBubakModule();
     quitTankModule();
 

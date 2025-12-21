@@ -9,7 +9,8 @@ add_executable(space_invaders
         textureManager.c
         tank.c
         bubak.c
-        bubakGroup.c)
+        bubakGroup.c
+        dynamic_array.c)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_options(space_invaders PRIVATE -fsanitize=address)

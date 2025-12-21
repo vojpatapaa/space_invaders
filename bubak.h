@@ -11,7 +11,8 @@ typedef enum
 {
     BUBAK_TYPE_GENERAL = 0,
     BUBAK_TYPE_COMMANDER,
-    BUBAK_TYPE_SOLIDER
+    BUBAK_TYPE_SOLIDER,
+    BUBAK_TYPE_DEAD
 }BubakType;
 
 typedef struct
@@ -19,8 +20,8 @@ typedef struct
     BubakType type;
     double xPos;
     double yPos;
-    double width;
-    double height;
+    int width;
+    int height;
     int alive;
     int spritePos;
 }Bubak;
@@ -28,7 +29,12 @@ typedef struct
 void initBubakModule();
 void quitBubakModule();
 
-Bubak createBubak(double x, double y, double bubakWidth, double bubakHeight, BubakType bubakType);
+double getBubakTopPos(Bubak * bubak);
+double getBubakRightPos(Bubak * bubak);
+double getBubakBottomPos(Bubak * bubak);
+double getBubakLeftPos(Bubak * bubak);
+
+Bubak createBubak(double x, double y, int bubakWidth, int bubakHeight, BubakType bubakType);
 void moveSpritePositionRight(Bubak * bubak);
 void updateBubak(Bubak * bubak);
 void renderBubak(Bubak * bubak);

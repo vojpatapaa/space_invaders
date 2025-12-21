@@ -22,7 +22,7 @@ int getCanvasHeight();
 SDL_Renderer * getRenderer();
 SDL_Window * get_window();
 
-void initGame(const char * windowLabel, int winWidth, int winHeight);
+void initGame(const char * windowLabel, int winWidth, int winHeight, int initialFPS, SDL_Color backgroundColor);
 
 void handleInput();
 void update();

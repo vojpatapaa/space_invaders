@@ -3,7 +3,8 @@
 
 int main(int argc, char ** argv)
 {
-    initGame("Space invaders", 960, 540);
+    SDL_Color background = {255, 255, 255, 255};
+    initGame("Space invaders", 960, 540, 60, background);
 
     Uint64 lastTime = SDL_GetPerformanceCounter();
     while (isRunning())

@@ -8,12 +8,23 @@
 /*!!!MUSI BYT SOUCET 3 PREDCHOZICH MAKER!!!*/
 #define BUBAK_ROWS 5
 
+#define BUBAK_HORIZONTAL_SPEED 15
+#define BUBAK_VERTICAL_SPEED 30
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include "game.h"
 #include "bubak.h"
+
+typedef enum
+{
+    RIGHT = 0,
+    DOWN,
+    LEFT,
+    UP
+}Direction;
 
 
 typedef struct
@@ -22,12 +33,18 @@ typedef struct
     int minDelay;
     int maxDelay;
     int currentDelay;
-    double padding;
-    double bubakWidth;
-    double bubakHeight;
+    int padding;
+    int bubakWidth;
+    int bubakHeight;
+    Uint64 lastUpdateTime;
+    Direction direction;
 }BubakGroup;
 
-BubakGroup createBubakGroup(int minDelayMs, int maxDelayMs, int paddingg, double bubakWidthh, double bubakHeightt);
+int getAliveBubaks(BubakGroup * bubakGroup);
+Bubak * getLeadingRightBubak(BubakGroup * bubakGroup);
+Bubak * getLeadingLeftBubak(BubakGroup * bubakGroup);
+
+BubakGroup createBubakGroup(int minDelayMs, int maxDelayMs, int paddingg, int bubakWidthh, int bubakHeightt);
 void updateBubakGroup(BubakGroup * bubakGroup);
 void renderBubakGroup(BubakGroup * bubakGroup);
 

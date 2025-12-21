@@ -15,12 +15,13 @@ void quitTankModule()
     SDL_DestroyTexture(tankTexture);
 }
 
-Tank createTank(double x, double y, double tankWidth, double tankHeight, int miliShootDelay)
+Tank createTank(double x, double y, int tankWidth, int tankHeight, int miliShootDelay)
 {
     Tank tank;
 
     tank.DelayTime = miliShootDelay;
     tank.lastShootTime = 0;
+    tank.lives = 3;
 
     tank.xPos = x;
     tank.yPos = y;
@@ -74,8 +75,8 @@ void renderTank(Tank * tank)
     SDL_Rect dst;
     dst.x = (int)tank->xPos;
     dst.y = (int)tank->yPos;
-    dst.w = (int)tank->width;
-    dst.h = (int)tank->height;
+    dst.w = tank->width;
+    dst.h = tank->height;
 
     SDL_RenderCopy(getRenderer(), tankTexture, NULL, &dst);
 }

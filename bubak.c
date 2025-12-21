@@ -9,11 +9,15 @@ const char * COMMANDER_BUBAK_TEXTURE_PATH = "assets/bubak/textures/bubak2.png";
 SpriteSheet * generalSpriteSheet;
 const char * GENERAL_BUBAK_TEXTURE_PATH = "assets/bubak/textures/bubak1.png";
 
+SDL_Texture * explodedTexture;
+const char * EXPLODED_BUBAK_TEXTURE_PATH = "assets/bubak/textures/explosion.png";
+
 void initBubakModule()
 {
     soliderSpriteSheet = createSpriteSheet(SOLIDER_BUBAK_TEXTURE_PATH, 12, 8, 2);
     commanderSpriteSheet = createSpriteSheet(COMMANDER_BUBAK_TEXTURE_PATH, 11, 8, 2);
     generalSpriteSheet = createSpriteSheet(GENERAL_BUBAK_TEXTURE_PATH, 8, 8, 2);
+    explodedTexture = createTextureFromImage(EXPLODED_BUBAK_TEXTURE_PATH);
 }
 
 
@@ -24,7 +28,27 @@ void quitBubakModule()
     destroySpriteSheet(generalSpriteSheet);
 }
 
-Bubak createBubak(double x, double y, double bubakWidth, double bubakHeight, BubakType bubakType)
+double getBubakTopPos(Bubak * bubak)
+{
+    return bubak->yPos;
+}
+
+double getBubakRightPos(Bubak * bubak)
+{
+    return bubak->xPos + bubak->width;
+}
+
+double getBubakBottomPos(Bubak * bubak)
+{
+    return bubak->yPos + bubak->height;
+}
+
+double getBubakLeftPos(Bubak * bubak)
+{
+    return bubak->xPos;
+}
+
+Bubak createBubak(double x, double y, int bubakWidth, int bubakHeight, BubakType bubakType)
 {
     Bubak bubak;
 
@@ -73,8 +97,8 @@ void renderBubak(Bubak * bubak)
 
     dst.x = (int)bubak->xPos;
     dst.y = (int)bubak->yPos;
-    dst.w = (int)bubak->width;
-    dst.h = (int)bubak->height;
+    dst.w = bubak->width;
+    dst.h = bubak->height;
 
     switch (bubak->type)
     {
@@ -104,6 +128,9 @@ void renderBubak(Bubak * bubak)
 
             SDL_RenderCopy(getRenderer(), generalSpriteSheet->texture, &src, &dst);
             break;
+
+        case BUBAK_TYPE_DEAD:
+            SDL_RenderCopy(getRenderer(), explodedTexture, NULL, &dst);
 
         default:
             break;

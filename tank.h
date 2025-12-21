@@ -11,8 +11,9 @@ typedef struct
 {
     double xPos;
     double yPos;
-    double width;
-    double height;
+    int width;
+    int height;
+    int lives;
 
     Uint64 lastShootTime;
     int DelayTime;
@@ -23,7 +24,7 @@ typedef struct
 void initTankModule();
 void quitTankModule();
 
-Tank createTank(double x, double y, double tankWidth, double tankHeight, int miliShootDelay);
+Tank createTank(double x, double y, int tankWidth, int tankHeight, int miliShootDelay);
 
 void updateTank(Tank * tank);
 void renderTank(Tank * tank);
