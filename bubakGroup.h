@@ -11,6 +11,10 @@
 #define BUBAK_HORIZONTAL_SPEED 15
 #define BUBAK_VERTICAL_SPEED 30
 
+#define BUBAK_PROJECTILE_SPEED 100
+#define BUBAK_PROJECTILE_WIDTH 4 
+#define BUBAK_PROJECTILE_HEIGHT 9
+
 
 #include <stdio.h>
 #include <stdlib.h>

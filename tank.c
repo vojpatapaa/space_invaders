@@ -1,4 +1,5 @@
 #include "tank.h"
+#include "projectile.h"
 
 #define MOVE_SPEED 250.0
 
@@ -35,6 +36,7 @@ Tank createTank(double x, double y, int tankWidth, int tankHeight, int miliShoot
 
 void updateTank(Tank * tank)
 {
+    //ovladani pomoci vstupu
     if(tank->activeInput)
     {
         const Uint8 * keyboardState = SDL_GetKeyboardState(NULL);
@@ -55,9 +57,38 @@ void updateTank(Tank * tank)
             {
                 tank->lastShootTime = currentTime;
                 printf("Pew!\n");
+                createProjectile(tank->xPos + tank->width/2.0, tank->yPos, TANK_PROJECTILE_WIDTH, TANK_PROJECTILE_HEIGHT, PROJECTILE_TYPE_TANK, TANK_PROJECTILE_SPEED);
             }
         }
     }
+
+    //kolize s nepratelkskymi strelami
+    SDL_Rect tankDst;
+    SDL_Rect shotDst;
+    dynarray * shots = getShots();
+    int count = shots->size;
+
+    tankDst.x = (int)tank->xPos;
+    tankDst.y = (int)tank->yPos;
+    tankDst.w = tank->width;
+    tankDst.h = tank->height;
+
+    for (int i = 0; i < count; i++)
+    {
+        Projectile * projectile = shots->items[i];
+        shotDst.x = (int)projectile->xPos;
+        shotDst.y = (int)projectile->yPos;
+        shotDst.w = projectile->width;
+        shotDst.h = projectile->height;
+
+        if(projectile->type == PROJECTILE_TYPE_ENEMY && SDL_HasIntersection(&tankDst, &shotDst))
+        {
+            tank->lives = tank->lives - 1;
+            destroyProjectile(projectile);
+            break;
+        }
+    }
+    
 
     if(tank->xPos < 0 )
     {

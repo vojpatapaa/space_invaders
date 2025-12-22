@@ -7,6 +7,10 @@
 #include "game.h"
 #include "textureManager.h"
 
+#define TANK_PROJECTILE_SPEED 300
+#define TANK_PROJECTILE_WIDTH 4
+#define TANK_PROJECTILE_HEIGHT 9
+
 typedef struct 
 {
     double xPos;

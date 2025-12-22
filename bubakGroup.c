@@ -1,4 +1,5 @@
 #include "bubakGroup.h"
+#include "projectile.h"
 
 int getAliveBubaks(BubakGroup * bubakGroup)
 {
@@ -126,11 +127,13 @@ void updateBubakGroup(BubakGroup * bubakGroup)
     bubakGroup->currentDelay = bubakGroup->minDelay + ((aliveBubaks - 1)/(double)(BUBAK_COLUMNS * BUBAK_ROWS)) * (bubakGroup->maxDelay - bubakGroup->minDelay);
     elapsedTime = (currentTime - bubakGroup->lastUpdateTime) / (double)SDL_GetPerformanceFrequency() * 1000;
 
+    //Updating only after certain ammount of time passed
     if(elapsedTime >= bubakGroup->currentDelay)
     {
         elapsedRounds = elapsedTime/bubakGroup->currentDelay;
         bubakGroup->lastUpdateTime = currentTime;
 
+        //Moving
         switch (bubakGroup->direction)
         {
             case RIGHT:
@@ -206,8 +209,32 @@ void updateBubakGroup(BubakGroup * bubakGroup)
             default:
                 break;
         }
+
+        //random shooting
+        int randomCount = rand()%(getAliveBubaks(bubakGroup) - 1 + 1) + 1;
+        
+        for (int i = 0; i < BUBAK_ROWS; i++)
+        {
+            for (int j = 0; j < BUBAK_COLUMNS && randomCount > 0; j++)
+            {
+                int random = rand()%(100-0+1) + 0;
+                if(random >= 99)
+                {
+                    randomCount--;
+                    
+                    double x = (int)bubakGroup->bubaks[i][j].xPos + bubakGroup->bubakWidth/2.0;
+                    double y = (int)bubakGroup->bubaks[i][j].yPos;
+                    createProjectile(x, y, BUBAK_PROJECTILE_WIDTH, BUBAK_PROJECTILE_HEIGHT, PROJECTILE_TYPE_ENEMY, BUBAK_PROJECTILE_SPEED);
+                }
+            }
+            
+        }
+        
         
     }
+
+    //kolize s nepratelkskymi strelami
+
 }
 
 void renderBubakGroup(BubakGroup * bubakGroup)

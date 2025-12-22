@@ -2,6 +2,7 @@
 #define SPACE_INVADERS_PROJECTILE_H
 
 #include <SDL2/SDL.h>
+#include "dynamic_array.h"
 
 typedef enum
 {
@@ -19,12 +20,18 @@ typedef struct
     double speed;
 }Projectile;
 
+void initProjectileModule();
+void quitProjectileModule();
+dynarray * getShots();
+
 Projectile * createProjectile(double x, double y, int width, int height, ProjectileType projectileType, double speed);
 
 void updateProjectile(Projectile * projectile);
 void renderProjectile(Projectile * projectile);
-
 void destroyProjectile(Projectile * projectile);
+
+void updateProjectiles();
+void renderProjectiles();
 
 
 #endif

@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include "game.h"
+#include "time.h"
 
 int main(int argc, char ** argv)
 {
+    srand(time(NULL));
     SDL_Color background = {255, 255, 255, 255};
     initGame("Space invaders", 960, 540, 60, background);
 

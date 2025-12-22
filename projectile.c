@@ -1,6 +1,25 @@
 #include "projectile.h"
 #include "game.h"
-#include <stdlib.h>
+
+dynarray shots;
+
+
+
+void initProjectileModule()
+{
+    dynarray_init(&shots, 10);
+}
+
+
+void quitProjectileModule()
+{
+    dynarray_free(&shots);
+}
+
+dynarray * getShots()
+{
+    return &shots;
+}
 
 Projectile * createProjectile(double x, double y, int width, int height, ProjectileType projectileType, double speed)
 {
@@ -17,12 +36,31 @@ Projectile * createProjectile(double x, double y, int width, int height, Project
     projectile->type = projectileType;
     projectile->speed = speed;
 
+    dynarray_push(&shots, projectile);
+
     return projectile;
 }
 
 void updateProjectile(Projectile * projectile)
 {
-    projectile->yPos += projectile->speed * getDeltaTime();
+    switch (projectile->type)
+    {
+        case PROJECTILE_TYPE_ENEMY:
+            projectile->yPos += projectile->speed * getDeltaTime();
+            break;
+
+        case PROJECTILE_TYPE_TANK:
+            projectile->yPos -= projectile->speed * getDeltaTime();
+            break;
+
+        default:
+            break;
+        }
+
+    if(projectile->yPos > getCanvasHeight() || projectile->yPos + projectile->height < 0 )
+    {
+        dynarray_remove(&shots, projectile);
+    }
 }
 
 void renderProjectile(Projectile * projectile)
@@ -53,8 +91,25 @@ void renderProjectile(Projectile * projectile)
 
 void destroyProjectile(Projectile * projectile)
 {
-    if(projectile != NULL)
+    dynarray_remove(&shots, projectile);
+}
+
+
+void updateProjectiles()
+{
+    int count = shots.size;
+    for (int i = 0; i < count; i++)
     {
-        free(projectile);
+        updateProjectile(shots.items[i]);
+    }
+    
+}
+
+void renderProjectiles()
+{
+    int count = shots.size;
+    for (int i = 0; i < count; i++)
+    {
+        renderProjectile(shots.items[i]);
     }
 }

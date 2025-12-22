@@ -7,6 +7,7 @@
 #include "game.h"
 #include "tank.h"
 #include "bubakGroup.h"
+#include "projectile.h"
 
 
 SDL_Window * window;
@@ -163,6 +164,8 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
     initBubakModule();
     enemyArmy = createBubakGroup(200, 800, 10, 35, 30);
 
+    initProjectileModule();
+
     chopin = Mix_LoadMUS("assets/tank/sfx/chopin.wav");
     
 
@@ -195,6 +198,7 @@ void update()
 {
     updateTank(&playerTank);
     updateBubakGroup(&enemyArmy);
+    updateProjectiles();
 }
 
 void render()
@@ -206,6 +210,7 @@ void render()
     /*tady bude rada na renderCopy*/
     renderTank(&playerTank);
     renderBubakGroup(&enemyArmy);
+    renderProjectiles();
 
     SDL_SetRenderTarget(renderer, NULL);
     SDL_RenderClear(renderer);
@@ -219,6 +224,7 @@ void clearGame()
 
     Mix_FreeMusic(chopin);
 
+    quitProjectileModule();
     quitBubakModule();
     quitTankModule();
 
