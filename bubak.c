@@ -129,8 +129,9 @@ void renderBubak(Bubak * bubak)
             SDL_RenderCopy(getRenderer(), generalSpriteSheet->texture, &src, &dst);
             break;
 
-        case BUBAK_TYPE_DEAD:
+        case BUBAK_TYPE_EXPLODED:
             SDL_RenderCopy(getRenderer(), explodedTexture, NULL, &dst);
+            break;
 
         default:
             break;

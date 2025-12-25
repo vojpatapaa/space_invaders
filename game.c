@@ -8,6 +8,7 @@
 #include "tank.h"
 #include "bubakGroup.h"
 #include "projectile.h"
+#include "shield.h"
 
 
 SDL_Window * window;
@@ -25,6 +26,10 @@ int desiredFPS;
 Tank playerTank;
 BubakGroup enemyArmy;
 Mix_Music * chopin;
+Shield shield1;
+Shield shield2;
+Shield shield3;
+Shield shield4;
 
 
 void setDesiredFPS(int fps)
@@ -144,6 +149,7 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
 
     background = backgroundColor;
     SDL_SetRenderDrawColor(renderer, background.r, background.g, background.b, background.a);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     canvas = createCanvasTexture(CANVAS_WIDTH, CANVAS_HEIGHT);
     if (canvas == NULL)
     {
@@ -162,9 +168,15 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
     playerTank = createTank(CANVAS_WIDTH/2 - (13.0/2.5), CANVAS_HEIGHT-(8.0 * 2.5)-25, 13.0 * 2.5, 8.0 * 2.5, 700);
 
     initBubakModule();
-    enemyArmy = createBubakGroup(200, 800, 10, 35, 30);
+    enemyArmy = createBubakGroup(100, 1000, 10, 35, 30);
 
     initProjectileModule();
+
+    SDL_Color shieldColor = {0, 0, 255, 255};
+    shield1 = createShield(getCanvasWidth()/4.0 * 0.35, 430.0, shieldColor);
+    shield2 = createShield(getCanvasWidth()/4.0 * 1.35, 430.0, shieldColor);
+    shield3 = createShield(getCanvasWidth()/4.0 * 2.35, 430.0, shieldColor);
+    shield4 = createShield(getCanvasWidth()/4.0 * 3.35, 430.0, shieldColor);
 
     chopin = Mix_LoadMUS("assets/tank/sfx/chopin.wav");
     
@@ -199,6 +211,10 @@ void update()
     updateTank(&playerTank);
     updateBubakGroup(&enemyArmy);
     updateProjectiles();
+    updateShield(&shield1);
+    updateShield(&shield2);
+    updateShield(&shield3);
+    updateShield(&shield4);
 }
 
 void render()
@@ -211,6 +227,10 @@ void render()
     renderTank(&playerTank);
     renderBubakGroup(&enemyArmy);
     renderProjectiles();
+    renderShield(&shield1);
+    renderShield(&shield2);
+    renderShield(&shield3);
+    renderShield(&shield4);
 
     SDL_SetRenderTarget(renderer, NULL);
     SDL_RenderClear(renderer);

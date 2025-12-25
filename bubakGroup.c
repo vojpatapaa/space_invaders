@@ -33,7 +33,7 @@ Bubak * getLeadingRightBubak(BubakGroup * bubakGroup)
         }   
     }
 
-    return &bubakGroup->bubaks[0][0];
+    return NULL;
     
 }
 
@@ -50,7 +50,7 @@ Bubak * getLeadingLeftBubak(BubakGroup * bubakGroup)
         }   
     }
 
-    return &bubakGroup->bubaks[0][0];
+    return NULL;
 }
 
 BubakGroup createBubakGroup(int minDelayMs, int maxDelayMs, int paddingg, int bubakWidthh, int bubakHeightt)
@@ -127,16 +127,38 @@ void updateBubakGroup(BubakGroup * bubakGroup)
     bubakGroup->currentDelay = bubakGroup->minDelay + ((aliveBubaks - 1)/(double)(BUBAK_COLUMNS * BUBAK_ROWS)) * (bubakGroup->maxDelay - bubakGroup->minDelay);
     elapsedTime = (currentTime - bubakGroup->lastUpdateTime) / (double)SDL_GetPerformanceFrequency() * 1000;
 
+    //Turning off the game
+    if(aliveBubaks == 0)
+    {
+        setRunning(0);
+        return;
+    }
+    
+
     //Updating only after certain ammount of time passed
     if(elapsedTime >= bubakGroup->currentDelay)
     {
         elapsedRounds = elapsedTime/bubakGroup->currentDelay;
         bubakGroup->lastUpdateTime = currentTime;
 
+        //SETTING EXPLODED TO DEAD (for rendering)
+        for (int i = 0; i < BUBAK_ROWS; i++)
+        {
+            for (int j = 0; j < BUBAK_COLUMNS; j++)
+            {
+                if(bubakGroup->bubaks[i][j].type == BUBAK_TYPE_EXPLODED)
+                {
+                    bubakGroup->bubaks[i][j].type = BUBAK_TYPE_DEAD;
+                }
+            }
+            
+        }
+
         //Moving
         switch (bubakGroup->direction)
         {
             case RIGHT:
+            moveSpeed = BUBAK_HORIZONTAL_SPEED;
             leadingBubak = getLeadingRightBubak(bubakGroup);
                 if(getBubakRightPos(leadingBubak) + BUBAK_HORIZONTAL_SPEED * elapsedRounds > getCanvasWidth())
                 {
@@ -161,7 +183,7 @@ void updateBubakGroup(BubakGroup * bubakGroup)
 
             case DOWN:
                 moveSpeed = BUBAK_VERTICAL_SPEED;
-                Bubak * leadingBubak = getLeadingLeftBubak(bubakGroup);
+                leadingBubak = getLeadingLeftBubak(bubakGroup);
                 if(leadingBubak->xPos == 0.0)
                 {
                     bubakGroup->direction = RIGHT;
@@ -183,6 +205,7 @@ void updateBubakGroup(BubakGroup * bubakGroup)
                 break;
 
             case LEFT:
+            moveSpeed = BUBAK_HORIZONTAL_SPEED;
                 leadingBubak = getLeadingLeftBubak(bubakGroup);
                 if(getBubakLeftPos(leadingBubak) - BUBAK_HORIZONTAL_SPEED * elapsedRounds < 0)
                 {
@@ -211,14 +234,14 @@ void updateBubakGroup(BubakGroup * bubakGroup)
         }
 
         //random shooting
-        int randomCount = rand()%(getAliveBubaks(bubakGroup) - 1 + 1) + 1;
+        int randomCount = rand()%(aliveBubaks - 1 + 1) + 1;
         
         for (int i = 0; i < BUBAK_ROWS; i++)
         {
             for (int j = 0; j < BUBAK_COLUMNS && randomCount > 0; j++)
             {
                 int random = rand()%(100-0+1) + 0;
-                if(random >= 99)
+                if(random >= 99 && bubakGroup->bubaks[i][j].alive)
                 {
                     randomCount--;
                     
@@ -234,7 +257,37 @@ void updateBubakGroup(BubakGroup * bubakGroup)
     }
 
     //kolize s nepratelkskymi strelami
+    dynarray * shots = getShots();
+    SDL_Rect bubakDst;
+    SDL_Rect shotDst;
+    for (int i = 0; i < BUBAK_ROWS; i++)
+    {
+        for (int j = 0; j < BUBAK_COLUMNS; j++)
+        {
+            bubakDst.x = (int)bubakGroup->bubaks[i][j].xPos;
+            bubakDst.y = (int)bubakGroup->bubaks[i][j].yPos;
+            bubakDst.w = bubakGroup->bubakWidth;
+            bubakDst.h = bubakGroup->bubakHeight;
 
+            for (int k = shots->size - 1; k >= 0; k--)
+            {
+                Projectile * shot = shots->items[k];
+
+                shotDst.x = (int)shot->xPos;
+                shotDst.y = (int)shot->yPos;
+                shotDst.w = shot->width;
+                shotDst.h = shot->height;
+
+                if(bubakGroup->bubaks[i][j].alive && shot->type == PROJECTILE_TYPE_TANK && SDL_HasIntersection(&shotDst, &bubakDst))
+                {
+                    bubakGroup->bubaks[i][j].alive = 0;
+                    bubakGroup->bubaks[i][j].type = BUBAK_TYPE_EXPLODED;
+                    destroyProjectile(shot);
+                }   
+            }
+        }
+    }   
+    
 }
 
 void renderBubakGroup(BubakGroup * bubakGroup)

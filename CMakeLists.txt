@@ -11,7 +11,8 @@ add_executable(space_invaders
         bubak.c
         bubakGroup.c
         dynamic_array.c
-        projectile.c)
+        projectile.c
+        shield.c)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_options(space_invaders PRIVATE -fsanitize=address)

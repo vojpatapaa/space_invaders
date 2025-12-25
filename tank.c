@@ -56,7 +56,6 @@ void updateTank(Tank * tank)
             if((currentTime - tank->lastShootTime)/(double)SDL_GetPerformanceFrequency() * 1000 >= tank->DelayTime)
             {
                 tank->lastShootTime = currentTime;
-                printf("Pew!\n");
                 createProjectile(tank->xPos + tank->width/2.0, tank->yPos, TANK_PROJECTILE_WIDTH, TANK_PROJECTILE_HEIGHT, PROJECTILE_TYPE_TANK, TANK_PROJECTILE_SPEED);
             }
         }
