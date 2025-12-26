@@ -9,6 +9,7 @@
 #include "bubakGroup.h"
 #include "projectile.h"
 #include "shield.h"
+#include "ufo.h"
 
 
 SDL_Window * window;
@@ -30,6 +31,7 @@ Shield shield1;
 Shield shield2;
 Shield shield3;
 Shield shield4;
+Ufo ufo;
 
 
 void setDesiredFPS(int fps)
@@ -165,10 +167,10 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
     running = 1;
 
     initTankModule();
-    playerTank = createTank(CANVAS_WIDTH/2 - (13.0/2.5), CANVAS_HEIGHT-(8.0 * 2.5)-25, 13.0 * 2.5, 8.0 * 2.5, 700);
+    playerTank = createTank(CANVAS_WIDTH/2 - (13.0/2.5), CANVAS_HEIGHT-(8.0 * 2.5)-25, 13.0 * 2.5, 8.0 * 2.5, 1000);
 
     initBubakModule();
-    enemyArmy = createBubakGroup(100, 1000, 10, 35, 30);
+    enemyArmy = createBubakGroup(50, 1000, 10, 35, 30);
 
     initProjectileModule();
 
@@ -177,6 +179,9 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
     shield2 = createShield(getCanvasWidth()/4.0 * 1.35, 430.0, shieldColor);
     shield3 = createShield(getCanvasWidth()/4.0 * 2.35, 430.0, shieldColor);
     shield4 = createShield(getCanvasWidth()/4.0 * 3.35, 430.0, shieldColor);
+
+    initUfoModule();
+    ufo = createUfo(0.0, 50.0, 50, 25, 10000, 200);
 
     chopin = Mix_LoadMUS("assets/tank/sfx/chopin.wav");
     
@@ -215,6 +220,7 @@ void update()
     updateShield(&shield2);
     updateShield(&shield3);
     updateShield(&shield4);
+    updateUfo(&ufo);
 }
 
 void render()
@@ -231,6 +237,7 @@ void render()
     renderShield(&shield2);
     renderShield(&shield3);
     renderShield(&shield4);
+    renderUfo(&ufo);
 
     SDL_SetRenderTarget(renderer, NULL);
     SDL_RenderClear(renderer);
@@ -244,6 +251,7 @@ void clearGame()
 
     Mix_FreeMusic(chopin);
 
+    quitUfoModule();
     quitProjectileModule();
     quitBubakModule();
     quitTankModule();

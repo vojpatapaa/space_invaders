@@ -1,4 +1,5 @@
 #include "bubak.h"
+#include "projectile.h"
 
 SpriteSheet * soliderSpriteSheet;
 const char * SOLIDER_BUBAK_TEXTURE_PATH = "assets/bubak/textures/bubak3.png";
@@ -87,7 +88,32 @@ void moveSpritePositionRight(Bubak * bubak)
 
 void updateBubak(Bubak * bubak)
 {
+    //kolize s nepratelkskymi strelami
+    dynarray * shots = getShots();
+    SDL_Rect bubakDst;
+    SDL_Rect shotDst;
 
+    bubakDst.x = (int)bubak->xPos;
+    bubakDst.y = (int)bubak->yPos;
+    bubakDst.w = bubak->width;
+    bubakDst.h = bubak->height;
+
+    for (int k = shots->size - 1; k >= 0; k--)
+    {
+        Projectile * shot = shots->items[k];
+
+        shotDst.x = (int)shot->xPos;
+        shotDst.y = (int)shot->yPos;
+        shotDst.w = shot->width;
+        shotDst.h = shot->height;
+
+        if(bubak->alive && shot->type == PROJECTILE_TYPE_TANK && SDL_HasIntersection(&shotDst, &bubakDst))
+        {
+            bubak->alive = 0;
+            bubak->type = BUBAK_TYPE_EXPLODED;
+            destroyProjectile(shot);
+        }   
+    }
 }
 
 void renderBubak(Bubak * bubak)

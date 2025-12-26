@@ -256,38 +256,15 @@ void updateBubakGroup(BubakGroup * bubakGroup)
         
     }
 
-    //kolize s nepratelkskymi strelami
-    dynarray * shots = getShots();
-    SDL_Rect bubakDst;
-    SDL_Rect shotDst;
+    //calling updateBubak
     for (int i = 0; i < BUBAK_ROWS; i++)
     {
         for (int j = 0; j < BUBAK_COLUMNS; j++)
         {
-            bubakDst.x = (int)bubakGroup->bubaks[i][j].xPos;
-            bubakDst.y = (int)bubakGroup->bubaks[i][j].yPos;
-            bubakDst.w = bubakGroup->bubakWidth;
-            bubakDst.h = bubakGroup->bubakHeight;
-
-            for (int k = shots->size - 1; k >= 0; k--)
-            {
-                Projectile * shot = shots->items[k];
-
-                shotDst.x = (int)shot->xPos;
-                shotDst.y = (int)shot->yPos;
-                shotDst.w = shot->width;
-                shotDst.h = shot->height;
-
-                if(bubakGroup->bubaks[i][j].alive && shot->type == PROJECTILE_TYPE_TANK && SDL_HasIntersection(&shotDst, &bubakDst))
-                {
-                    bubakGroup->bubaks[i][j].alive = 0;
-                    bubakGroup->bubaks[i][j].type = BUBAK_TYPE_EXPLODED;
-                    destroyProjectile(shot);
-                }   
-            }
+            updateBubak(&bubakGroup->bubaks[i][j]);
         }
-    }   
-    
+        
+    } 
 }
 
 void renderBubakGroup(BubakGroup * bubakGroup)
