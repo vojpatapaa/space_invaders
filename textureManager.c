@@ -1,7 +1,3 @@
-//
-// Created by Intel on 14/12/2025.
-//
-
 #include "textureManager.h"
 
 SDL_Texture * createTextureFromImage(const char * path)
@@ -12,6 +8,35 @@ SDL_Texture * createTextureFromImage(const char * path)
         printf("Could not find load the image: %s\n", path);
     }
     SDL_Texture * texture = SDL_CreateTextureFromSurface(getRenderer(), surface);
+    SDL_FreeSurface(surface);
+
+    return texture;
+}
+
+SDL_Texture * createTextureFromText(const char * str, char * fontPath, int width, int height, SDL_Color color)
+{
+    SDL_Surface * surface = NULL;
+    SDL_Texture * texture = NULL;
+    TTF_Font * font = TTF_OpenFont(fontPath, 24);
+
+    if(font == NULL)
+    {
+        return NULL;
+    }
+
+    surface = TTF_RenderText_Solid(font, str, color);
+    if(surface == NULL)
+    {
+        return NULL;
+    }
+
+    texture = SDL_CreateTextureFromSurface(getRenderer(), surface);
+    if(texture == NULL)
+    {
+        SDL_FreeSurface(surface);
+        return NULL;
+    }
+
     SDL_FreeSurface(surface);
 
     return texture;

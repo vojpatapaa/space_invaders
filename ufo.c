@@ -2,6 +2,7 @@
 #include "textureManager.h"
 #include "game.h"
 #include "projectile.h"
+#include "scoreManager.h"
 
 SDL_Texture * ufoTexture;
 const char * UFO_TEXTURE_PATH= "assets/ufo/textures/ufo.png";
@@ -95,6 +96,7 @@ void updateUfo(Ufo * ufo)
         if(shot->type == PROJECTILE_TYPE_TANK && SDL_HasIntersection(&shotDst, &ufoDst))
         {
             destroyProjectile(shot);
+            addToScore(20);
         }
 
     }

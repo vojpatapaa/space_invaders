@@ -7,14 +7,30 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 
+typedef struct
+{
+    int x;
+    int y;
+    int leftClicked;
+}MouseState;
+
+typedef enum
+{
+    GAME_PART_MENU = 0,
+    GAME_PART_PLAY
+}GamePart;
+
 void setDesiredFPS(int fps);
 int getDesiredFPS();
 double getDesiredMaxMilPerFrame();
 void setDeltaTime(double delta);
 double getDeltaTime();
+GamePart getCurrentGamePart();
+void setCurrentGamePart(GamePart gamePart);
 
 void setRunning(int newRunning);
 int isRunning();
+
 
 int getCanvasWidth();
 int getCanvasHeight();
@@ -31,4 +47,4 @@ void render();
 void clearGame();
 
 
-#endif //SPACE_INVADERS_GAME_H
+#endif

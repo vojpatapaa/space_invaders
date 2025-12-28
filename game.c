@@ -10,6 +10,7 @@
 #include "projectile.h"
 #include "shield.h"
 #include "ufo.h"
+#include "scoreManager.h"
 
 
 SDL_Window * window;
@@ -18,6 +19,7 @@ SDL_Texture * canvas;
 SDL_Color background;
 
 int running;
+GamePart currentGamePart;
 
 double desiredMaxMilPerFrame;
 double deltaTime;
@@ -58,6 +60,16 @@ void setDeltaTime(double delta)
 double getDeltaTime()
 {
     return deltaTime;
+}
+
+GamePart getCurrentGamePart()
+{
+    return currentGamePart;
+}
+
+void setCurrentGamePart(GamePart gamePart)
+{
+    currentGamePart = gamePart;
 }
 
 void setRunning(int newRunning)
@@ -165,6 +177,7 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
     }
 
     running = 1;
+    currentGamePart = GAME_PART_PLAY;
 
     initTankModule();
     playerTank = createTank(CANVAS_WIDTH/2 - (13.0/2.5), CANVAS_HEIGHT-(8.0 * 2.5)-25, 13.0 * 2.5, 8.0 * 2.5, 1000);
@@ -184,14 +197,19 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
     ufo = createUfo(0.0, 50.0, 50, 25, 10000, 200);
 
     chopin = Mix_LoadMUS("assets/tank/sfx/chopin.wav");
-    
 
+    int loadedScore = loadScore();
+    if(loadedScore == -1)
+    {
+        setScore(0);
+    }
 
 }
 
 void handleInput()
 {
     SDL_Event event;
+
 
     while (SDL_PollEvent(&event))
     {

@@ -17,7 +17,7 @@ typedef struct
 }SpriteSheet;
 
 SDL_Texture * createTextureFromImage(const char * path);
-SDL_Texture * createTextureFromText(const char * str, TTF_Font font, int width, int height);
+SDL_Texture * createTextureFromText(const char * str, char * fontPath, int width, int height, SDL_Color color);
 SDL_Texture * createCanvasTexture(int width, int height);
 
 SpriteSheet * createSpriteSheet(const char * path, int boxWidthh, int boxHeightt, int boxCountt);

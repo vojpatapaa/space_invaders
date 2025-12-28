@@ -1,5 +1,6 @@
 #include "bubak.h"
 #include "projectile.h"
+#include "scoreManager.h"
 
 SpriteSheet * soliderSpriteSheet;
 const char * SOLIDER_BUBAK_TEXTURE_PATH = "assets/bubak/textures/bubak3.png";
@@ -109,6 +110,24 @@ void updateBubak(Bubak * bubak)
 
         if(bubak->alive && shot->type == PROJECTILE_TYPE_TANK && SDL_HasIntersection(&shotDst, &bubakDst))
         {
+            switch (bubak->type)
+            {
+                case BUBAK_TYPE_SOLIDER:
+                    addToScore(5);
+                    break;
+
+                case BUBAK_TYPE_COMMANDER:
+                    addToScore(10);
+                    break;
+
+                case BUBAK_TYPE_GENERAL:
+                    addToScore(20);
+                    break;
+                
+                default:
+                    break;
+            }
+
             bubak->alive = 0;
             bubak->type = BUBAK_TYPE_EXPLODED;
             destroyProjectile(shot);
