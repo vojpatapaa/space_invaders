@@ -11,6 +11,7 @@
 #include "shield.h"
 #include "ufo.h"
 #include "scoreManager.h"
+#include "ui.h"
 
 
 SDL_Window * window;
@@ -25,6 +26,8 @@ double desiredMaxMilPerFrame;
 double deltaTime;
 int desiredFPS;
 
+MouseState mouseState;
+
 /*Game objects*/
 Tank playerTank;
 BubakGroup enemyArmy;
@@ -34,6 +37,9 @@ Shield shield2;
 Shield shield3;
 Shield shield4;
 Ufo ufo;
+
+/*UI*/
+Label * labelTest;
 
 
 void setDesiredFPS(int fps)
@@ -82,6 +88,21 @@ int isRunning()
     return running;
 }
 
+int getWindowWidth()
+{
+    int width;
+    SDL_GetWindowSize(window, &width, NULL);
+    return width;
+}
+
+
+int getWindowHeight()
+{
+    int height;
+    SDL_GetWindowSize(window, &height, NULL);
+    return height;
+}
+
 int getCanvasWidth()
 {
     return CANVAS_WIDTH;
@@ -90,6 +111,11 @@ int getCanvasWidth()
 int getCanvasHeight()
 {
     return CANVAS_HEIGHT;
+}
+
+MouseState * getMouseState()
+{
+    return &mouseState;
 }
 
 SDL_Renderer * getRenderer()
@@ -204,12 +230,27 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
         setScore(0);
     }
 
+    mouseState.leftClicked = 0;
+    mouseState.x = 0;
+    mouseState.y = 0;
+
+
+    SDL_Color text = {255, 0, 0, 255};
+    SDL_Color backgr = {156, 138, 10, 255};
+    labelTest = createLabel(20, 20, 300, 80, 0, "Testovani je fajn", text, backgr);
+
 }
 
 void handleInput()
 {
     SDL_Event event;
 
+    mouseState.leftClicked = 0;
+    int screenPosX;
+    int screenPosY;
+    SDL_GetMouseState(&screenPosX, &screenPosY);
+    mouseState.x = (double)getWindowWidth() / (double)getCanvasWidth() * screenPosX;
+    mouseState.y = (double)getWindowHeight() / (double)getCanvasHeight() * screenPosY;
 
     while (SDL_PollEvent(&event))
     {
@@ -220,7 +261,7 @@ void handleInput()
                 break;
 
             case SDL_MOUSEBUTTONDOWN:
-                    Mix_FadeInMusicPos(chopin, 0, 10000, 5.0);
+                    mouseState.leftClicked = 1;
                     break;
 
         }
@@ -231,6 +272,12 @@ void handleInput()
 
 void update()
 {
+
+    if(mouseState.leftClicked)
+    {
+        Mix_FadeInMusicPos(chopin, 0, 10000, 5.0);
+    }
+
     updateTank(&playerTank);
     updateBubakGroup(&enemyArmy);
     updateProjectiles();
@@ -257,6 +304,8 @@ void render()
     renderShield(&shield4);
     renderUfo(&ufo);
 
+    renderLabel(labelTest);
+
     SDL_SetRenderTarget(renderer, NULL);
     SDL_RenderClear(renderer);
     SDL_RenderCopy(renderer, canvas, NULL, NULL);
@@ -266,6 +315,8 @@ void render()
 
 void clearGame()
 {
+
+    destroyLabel(labelTest);
 
     Mix_FreeMusic(chopin);
 

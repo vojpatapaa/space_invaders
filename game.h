@@ -31,9 +31,12 @@ void setCurrentGamePart(GamePart gamePart);
 void setRunning(int newRunning);
 int isRunning();
 
-
+int getWindowWidth();
+int getWindowHeight();
 int getCanvasWidth();
 int getCanvasHeight();
+
+MouseState * getMouseState();
 
 SDL_Renderer * getRenderer();
 SDL_Window * get_window();

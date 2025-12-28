@@ -38,6 +38,7 @@ SDL_Texture * createTextureFromText(const char * str, char * fontPath, int width
     }
 
     SDL_FreeSurface(surface);
+    TTF_CloseFont(font);
 
     return texture;
 }

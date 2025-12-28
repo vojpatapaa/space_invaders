@@ -31,6 +31,7 @@ typedef struct
     SDL_Color backgroundColor;
     SDL_Color secondaryBackgroundColor;
     SDL_Texture * textTexture;
+    int hovered;
 
     void (*onClickAction)(void);
 }Button;
