@@ -1,5 +1,6 @@
 #include "bubakGroup.h"
 #include "projectile.h"
+#include "scoreManager.h"
 
 int getAliveBubaks(BubakGroup * bubakGroup)
 {
@@ -64,6 +65,7 @@ BubakGroup createBubakGroup(int minDelayMs, int maxDelayMs, int paddingg, int bu
     bubakGroup.currentDelay = maxDelayMs;
     bubakGroup.bubakWidth = bubakWidthh;
     bubakGroup.bubakHeight = bubakHeightt;
+    
 
     int width = BUBAK_COLUMNS * bubakGroup.bubakWidth + (BUBAK_COLUMNS - 1) * bubakGroup.padding;
     int height = BUBAK_ROWS * bubakGroup.bubakHeight + (BUBAK_ROWS - 1) * bubakGroup.padding;
@@ -130,7 +132,9 @@ void updateBubakGroup(BubakGroup * bubakGroup)
     //Turning off the game
     if(aliveBubaks == 0)
     {
-        setRunning(0);
+        int score = getScore();
+        initGameSessionWithoutTank();
+        setScore(score);
         return;
     }
     
@@ -246,7 +250,7 @@ void updateBubakGroup(BubakGroup * bubakGroup)
                     randomCount--;
                     
                     double x = (int)bubakGroup->bubaks[i][j].xPos + bubakGroup->bubakWidth/2.0;
-                    double y = (int)bubakGroup->bubaks[i][j].yPos;
+                    double y = (int)bubakGroup->bubaks[i][j].yPos + bubakGroup->bubakHeight;
                     createProjectile(x, y, BUBAK_PROJECTILE_WIDTH, BUBAK_PROJECTILE_HEIGHT, PROJECTILE_TYPE_ENEMY, BUBAK_PROJECTILE_SPEED);
                 }
             }

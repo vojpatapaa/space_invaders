@@ -25,7 +25,6 @@ int main(int argc, char ** argv)
         {
             SDL_Delay(getDesiredMaxMilPerFrame() - elapsedMili);
         }
-
     }
     clearGame();
 

@@ -97,12 +97,17 @@ void destroyProjectile(Projectile * projectile)
 
 void updateProjectiles()
 {
-    int count = shots.size;
-    for (int i = 0; i < count; i++)
+    int i = 0;
+    while (i < shots.size)
     {
-        updateProjectile(shots.items[i]);
+        Projectile * projectile = shots.items[i];
+        updateProjectile(projectile);
+
+        if (i < shots.size && shots.items[i] == projectile)
+        {
+            i++;
+        }
     }
-    
 }
 
 void renderProjectiles()

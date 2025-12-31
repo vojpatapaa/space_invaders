@@ -1,7 +1,7 @@
 #include "scoreManager.h"
 #include <stdio.h>
 
-char * SCORE_PATH = "data/score.dat";
+char * SCORE_PATH = "score.dat";
 int score;
 
 void setScore(int newScore)
@@ -39,15 +39,16 @@ void saveScore()
 int loadScore()
 {
     FILE * file = NULL;
-    int buffer = -1;
+    int buffer = 0;
     
     file = fopen(SCORE_PATH, "rb");
     if(file == NULL)
     {
-        return -1;
+        return 0;
     }
 
     fread(&buffer, sizeof(buffer), 1, file);
+    fclose(file);
 
     return buffer;
 }

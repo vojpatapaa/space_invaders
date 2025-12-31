@@ -15,7 +15,8 @@ add_executable(space_invaders
         shield.c
         ufo.c
         scoreManager.c
-        ui.c)
+        ui.c
+        eventFunctions.c)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_options(space_invaders PRIVATE -fsanitize=address)

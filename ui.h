@@ -7,15 +7,13 @@ typedef struct
 {
     double xPos;
     double yPos;
-    int width;
-    int height;
-    int padding;
+    double width;
+    double height;
     SDL_Color textColor;
-    SDL_Color backgroundColor;
     SDL_Texture * textTexture;
 }Label;
 
-Label * createLabel(double x, double y, int width, int height, int padding, char * text, SDL_Color textColor, SDL_Color backgroundColor);
+Label * createLabel(double x, double y, double widthScale, double heightScale, char * text, SDL_Color textColor);
 void updateLabelText(Label * label, char * text);
 void renderLabel(Label * label);
 void destroyLabel(Label * label);
@@ -26,7 +24,6 @@ typedef struct
     double yPos;
     int width;
     int height;
-    int padding;
     SDL_Color textColor;
     SDL_Color backgroundColor;
     SDL_Color secondaryBackgroundColor;

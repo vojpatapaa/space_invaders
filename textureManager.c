@@ -13,7 +13,7 @@ SDL_Texture * createTextureFromImage(const char * path)
     return texture;
 }
 
-SDL_Texture * createTextureFromText(const char * str, char * fontPath, int width, int height, SDL_Color color)
+SDL_Texture * createTextureFromText(const char * str, char * fontPath, SDL_Color color)
 {
     SDL_Surface * surface = NULL;
     SDL_Texture * texture = NULL;
@@ -78,6 +78,12 @@ SpriteSheet * createSpriteSheet(const char * path, int boxWidthh, int boxHeightt
 
 void destroySpriteSheet(SpriteSheet * spriteSheet)
 {
-    SDL_DestroyTexture(spriteSheet->texture);
-    free(spriteSheet);
+    if(spriteSheet != NULL)
+    {
+        if(spriteSheet->texture != NULL)
+        {
+            SDL_DestroyTexture(spriteSheet->texture);
+        }
+        free(spriteSheet);
+    }
 }

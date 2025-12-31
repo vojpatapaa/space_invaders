@@ -12,6 +12,7 @@
 #include "ufo.h"
 #include "scoreManager.h"
 #include "ui.h"
+#include "eventFunctions.h"
 
 
 SDL_Window * window;
@@ -39,8 +40,17 @@ Shield shield4;
 Ufo ufo;
 
 /*UI*/
-Label * labelTest;
-
+Label * gameLabel;
+Button * playButton;
+Button * toggleDarkModeButton;
+Button * exitGameButton;
+Button * set120FpsButton;
+Button * set60FpsButton;
+Button * set30FpsButton;
+Button * set20FpsButton;
+Label * bestScoreLabel;
+Label * bestScoreNumberLabel;
+Label * currentScoreLabel;
 
 void setDesiredFPS(int fps)
 {
@@ -99,7 +109,7 @@ int getWindowWidth()
 int getWindowHeight()
 {
     int height;
-    SDL_GetWindowSize(window, &height, NULL);
+    SDL_GetWindowSize(window, NULL, &height);
     return height;
 }
 
@@ -111,6 +121,16 @@ int getCanvasWidth()
 int getCanvasHeight()
 {
     return CANVAS_HEIGHT;
+}
+
+void setBackgroundColor(SDL_Color backgroundColor)
+{
+    background = backgroundColor;
+}
+
+SDL_Color getBackgroundColor()
+{
+    return background;
 }
 
 MouseState * getMouseState()
@@ -126,6 +146,43 @@ SDL_Renderer * getRenderer()
 SDL_Window * get_window()
 {
     return window;
+}
+
+void initGameSession()
+{
+    playerTank = createTank(getCanvasWidth()/4.0 * 2.35, CANVAS_HEIGHT-(8.0 * 2.5)-25, 13.0 * 2.5, 8.0 * 2.5, 1000);
+
+    enemyArmy = createBubakGroup(50, 1000, 10, 35, 30);
+
+    SDL_Color shieldColor = {0, 0, 255, 255};
+    shield1 = createShield(getCanvasWidth()/4.0 * 0.35, 430.0, shieldColor);
+    shield2 = createShield(getCanvasWidth()/4.0 * 1.35, 430.0, shieldColor);
+    shield3 = createShield(getCanvasWidth()/4.0 * 2.35, 430.0, shieldColor);
+    shield4 = createShield(getCanvasWidth()/4.0 * 3.35, 430.0, shieldColor);
+
+    ufo = createUfo(0.0, 50.0, 50.0, 25, 10000, 200);
+
+    setCurrentGamePart(GAME_PART_PLAY);
+
+    setScore(0);
+}
+
+void initGameSessionWithoutTank()
+{
+
+    enemyArmy = createBubakGroup(50, 1000, 10, 35, 30);
+
+    SDL_Color shieldColor = {0, 0, 255, 255};
+    shield1 = createShield(getCanvasWidth()/4.0 * 0.35, 430.0, shieldColor);
+    shield2 = createShield(getCanvasWidth()/4.0 * 1.35, 430.0, shieldColor);
+    shield3 = createShield(getCanvasWidth()/4.0 * 2.35, 430.0, shieldColor);
+    shield4 = createShield(getCanvasWidth()/4.0 * 3.35, 430.0, shieldColor);
+
+    ufo = createUfo(0.0, 50.0, 50.0, 25, 10000, 200);
+
+    setCurrentGamePart(GAME_PART_PLAY);
+
+    setScore(0);
 }
 
 void initGame(const char * windowLabel, int winWidth, int winHeight, int initialFPS, SDL_Color backgroundColor)
@@ -185,6 +242,10 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
         exit(-1);
     }
 
+    if(SDL_SetHint(SDL_HINT_SHUTDOWN_DBUS_ON_QUIT, "1") == SDL_TRUE)
+    {
+        printf("yes");
+    }
     setDesiredFPS(initialFPS);
 
     background = backgroundColor;
@@ -202,42 +263,44 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
         exit(-1);
     }
 
-    running = 1;
-    currentGamePart = GAME_PART_PLAY;
-
-    initTankModule();
-    playerTank = createTank(CANVAS_WIDTH/2 - (13.0/2.5), CANVAS_HEIGHT-(8.0 * 2.5)-25, 13.0 * 2.5, 8.0 * 2.5, 1000);
-
-    initBubakModule();
-    enemyArmy = createBubakGroup(50, 1000, 10, 35, 30);
-
-    initProjectileModule();
-
-    SDL_Color shieldColor = {0, 0, 255, 255};
-    shield1 = createShield(getCanvasWidth()/4.0 * 0.35, 430.0, shieldColor);
-    shield2 = createShield(getCanvasWidth()/4.0 * 1.35, 430.0, shieldColor);
-    shield3 = createShield(getCanvasWidth()/4.0 * 2.35, 430.0, shieldColor);
-    shield4 = createShield(getCanvasWidth()/4.0 * 3.35, 430.0, shieldColor);
-
-    initUfoModule();
-    ufo = createUfo(0.0, 50.0, 50, 25, 10000, 200);
+    setRunning(1);
+    setCurrentGamePart(GAME_PART_MENU);
 
     chopin = Mix_LoadMUS("assets/tank/sfx/chopin.wav");
 
     int loadedScore = loadScore();
-    if(loadedScore == -1)
-    {
-        setScore(0);
-    }
+    setScore(loadedScore);
+
+    initUfoModule();
+    initTankModule();
+    initBubakModule();
+    initProjectileModule();
+
+    /*UI*/
+    SDL_Color uiBackgroundColor = {59, 130, 246, 255};
+    SDL_Color uiBackgroundHoverColor = {37, 99, 235, 255};
+    SDL_Color uiTransparent = {255, 255, 255, 255};
+    SDL_Color uiTextColor = {30, 64, 175, 255};
+
+    gameLabel = createLabel(180, 0, 2.0, 2.0, "Space invaders", uiTextColor);
+    playButton = createButton(30, 180, 200, 70, 0, "Play", uiTextColor, uiBackgroundColor, uiBackgroundHoverColor, initGameSession);
+    toggleDarkModeButton = createButton(30, 255, 200, 70, 0, "Dark/white", uiTextColor, uiBackgroundColor, uiBackgroundHoverColor, toggleDarkModeEvent);
+    exitGameButton = createButton(30, 330, 200, 70, 0, "Exit", uiTextColor, uiBackgroundColor, uiBackgroundHoverColor, endGameEvent);
+    set120FpsButton = createButton(30, 430, 60, 40, 0, "120", uiTextColor, uiBackgroundColor, uiBackgroundHoverColor, set120FpsEvent);
+    set60FpsButton  = createButton(100, 430, 60, 40, 0, "60", uiTextColor, uiBackgroundColor, uiBackgroundHoverColor, set60FpsEvent);
+    set30FpsButton  = createButton(30, 480, 60, 40, 0, "30", uiTextColor, uiBackgroundColor, uiBackgroundHoverColor, set30FpsEvent);
+    set20FpsButton  = createButton(100, 480, 60, 40, 0, "20", uiTextColor, uiBackgroundColor, uiBackgroundHoverColor, set20FpsEvent);
+    bestScoreLabel = createLabel(450, 450, 1.0, 1.0, "Best Score: ", uiTextColor);
+    char scoreBuffer[12];
+    sprintf(scoreBuffer, "%d", getScore());
+    bestScoreNumberLabel = createLabel(700, 450, 1.0, 1.0, scoreBuffer, uiTextColor);
+    currentScoreLabel = createLabel(10.0, 10.0, 1.0, 1.0, "0", uiTextColor);
+
 
     mouseState.leftClicked = 0;
     mouseState.x = 0;
     mouseState.y = 0;
 
-
-    SDL_Color text = {255, 0, 0, 255};
-    SDL_Color backgr = {156, 138, 10, 255};
-    labelTest = createLabel(20, 20, 300, 80, 0, "Testovani je fajn", text, backgr);
 
 }
 
@@ -249,8 +312,8 @@ void handleInput()
     int screenPosX;
     int screenPosY;
     SDL_GetMouseState(&screenPosX, &screenPosY);
-    mouseState.x = (double)getWindowWidth() / (double)getCanvasWidth() * screenPosX;
-    mouseState.y = (double)getWindowHeight() / (double)getCanvasHeight() * screenPosY;
+    mouseState.x = (double)screenPosX / (double)getWindowWidth() * (double)getCanvasWidth();
+    mouseState.y = (double)screenPosY / (double)getWindowHeight() * (double)getCanvasHeight();
 
     while (SDL_PollEvent(&event))
     {
@@ -266,26 +329,50 @@ void handleInput()
 
         }
     }
-    
-
 }
 
 void update()
 {
+    int score;
+    char buffer[20];
 
-    if(mouseState.leftClicked)
+    switch (getCurrentGamePart())
     {
-        Mix_FadeInMusicPos(chopin, 0, 10000, 5.0);
+        case GAME_PART_MENU:
+            updateButton(playButton);
+            updateButton(toggleDarkModeButton);
+            updateButton(exitGameButton);
+            updateButton(set120FpsButton);
+            updateButton(set60FpsButton);
+            updateButton(set30FpsButton);
+            updateButton(set20FpsButton);
+
+            score = getScore();
+            sprintf(buffer, "%d", score);
+            updateLabelText(bestScoreNumberLabel, buffer);
+
+            break;
+
+        case GAME_PART_PLAY:
+            updateTank(&playerTank);
+            updateBubakGroup(&enemyArmy);
+            updateProjectiles();
+            updateShield(&shield1);
+            updateShield(&shield2);
+            updateShield(&shield3);
+            updateShield(&shield4);
+
+            score = getScore();
+            sprintf(buffer, "Score: %d", score);
+            updateLabelText(currentScoreLabel, buffer);
+
+            updateUfo(&ufo);
+            break;
+       
+        default:
+            break;
     }
 
-    updateTank(&playerTank);
-    updateBubakGroup(&enemyArmy);
-    updateProjectiles();
-    updateShield(&shield1);
-    updateShield(&shield2);
-    updateShield(&shield3);
-    updateShield(&shield4);
-    updateUfo(&ufo);
 }
 
 void render()
@@ -295,16 +382,37 @@ void render()
     SDL_RenderClear(renderer);
 
     /*tady bude rada na renderCopy*/
-    renderTank(&playerTank);
-    renderBubakGroup(&enemyArmy);
-    renderProjectiles();
-    renderShield(&shield1);
-    renderShield(&shield2);
-    renderShield(&shield3);
-    renderShield(&shield4);
-    renderUfo(&ufo);
+    switch (getCurrentGamePart())
+    {
+        case GAME_PART_MENU:
+            renderLabel(gameLabel);
+            renderButton(playButton);
+            renderButton(toggleDarkModeButton);
+            renderButton(exitGameButton);
+            renderButton(set120FpsButton);
+            renderButton(set60FpsButton);
+            renderButton(set30FpsButton);
+            renderButton(set20FpsButton);
+            renderLabel(bestScoreLabel);
+            renderLabel(bestScoreNumberLabel);
+            break;
 
-    renderLabel(labelTest);
+        case GAME_PART_PLAY:
+            renderTank(&playerTank);
+            renderBubakGroup(&enemyArmy);
+            renderProjectiles();
+            renderShield(&shield1);
+            renderShield(&shield2);
+            renderShield(&shield3);
+            renderShield(&shield4);
+            renderLabel(currentScoreLabel);
+            renderUfo(&ufo);
+            break;
+        
+        default:
+            break;
+    }
+
 
     SDL_SetRenderTarget(renderer, NULL);
     SDL_RenderClear(renderer);
@@ -315,8 +423,6 @@ void render()
 
 void clearGame()
 {
-
-    destroyLabel(labelTest);
 
     Mix_FreeMusic(chopin);
 

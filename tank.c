@@ -1,18 +1,28 @@
 #include "tank.h"
 #include "projectile.h"
+#include "scoreManager.h"
+#include "ui.h"
 
 #define MOVE_SPEED 250.0
 
-static SDL_Texture * tankTexture = NULL;
-static const char * TANK_TEXTURE_PATH = "assets/tank/textures/tank.png";
+#define LIFE_LINE_WIDTH 90
+#define LIFE_LINE_HEIGHT 10
+
+SDL_Color uiTextColor = {30, 64, 175, 255};
+SDL_Texture * tankTexture = NULL;
+const char * TANK_TEXTURE_PATH = "assets/tank/textures/tank.png";
+Label * lifesLabel;
+
 
 void initTankModule()
 {
     tankTexture = createTextureFromImage(TANK_TEXTURE_PATH);
+    lifesLabel = createLabel(930.0, 10.0, 1.2, 1.2, "3", uiTextColor);
 }
 
 void quitTankModule()
 {
+    destroyLabel(lifesLabel);
     SDL_DestroyTexture(tankTexture);
 }
 
@@ -98,6 +108,20 @@ void updateTank(Tank * tank)
     {
         tank->xPos = getCanvasWidth() - tank->width;
     }
+
+    if(tank->lives == 0)
+    {
+        int biggestScore = loadScore();
+        if(getScore() > biggestScore)
+        {
+            saveScore();
+        }
+        setCurrentGamePart(GAME_PART_MENU);
+    }
+
+    char buffer[20];
+    sprintf(buffer, "%d", tank->lives);
+    updateLabelText(lifesLabel, buffer);
 }
 
 void renderTank(Tank * tank)
@@ -109,4 +133,19 @@ void renderTank(Tank * tank)
     dst.h = tank->height;
 
     SDL_RenderCopy(getRenderer(), tankTexture, NULL, &dst);
+
+    SDL_Rect lineDst;
+    lineDst.w = LIFE_LINE_WIDTH;
+    lineDst.h = LIFE_LINE_HEIGHT;
+    lineDst.y = getCanvasHeight() - 5;
+    lineDst.x = 5;
+    SDL_SetRenderDrawColor(getRenderer(), uiTextColor.r, uiTextColor.g, uiTextColor.b, 255);
+    for (int i = 0; i < tank->lives; i++)
+    {
+        SDL_RenderFillRect(getRenderer(), &lineDst);
+        lineDst.x += LIFE_LINE_WIDTH + 5;
+    }
+
+    renderLabel(lifesLabel);
+    
 }

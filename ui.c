@@ -2,9 +2,9 @@
 #include "textureManager.h"
 #include <stdlib.h>
 
-char * FONT_PATH = "assets/fonts/Cascadia.ttf";
+char * FONT_PATH = "assets/fonts/moby.monospace.ttf";
 
-Label * createLabel(double x, double y, int width, int height, int padding, char * text, SDL_Color textColor, SDL_Color backgroundColor)
+Label * createLabel(double x, double y, double widthScale, double heightScale, char * text, SDL_Color textColor)
 {
     Label * label = (Label *)malloc(sizeof(Label));
     if(label == NULL)
@@ -14,39 +14,32 @@ Label * createLabel(double x, double y, int width, int height, int padding, char
 
     label->xPos = x;
     label->yPos = y;
-    label->width = width;
-    label->height = height;
-    label->padding = padding;
-    label->backgroundColor = backgroundColor;
+    label->width = widthScale;
+    label->height = heightScale;
     label->textColor = textColor;
 
-    label->textTexture = createTextureFromText(text, FONT_PATH, width-padding, height-padding, textColor);
+    label->textTexture = createTextureFromText(text, FONT_PATH, textColor);
     return label;
 }
 
 void updateLabelText(Label * label, char * text)
 {
     SDL_DestroyTexture(label->textTexture);
-    label->textTexture = createTextureFromText(text, FONT_PATH, label->width - label->padding, label->height - label->padding, label->textColor);
+    label->textTexture = createTextureFromText(text, FONT_PATH, label->textColor);
 }
 
 void renderLabel(Label * label)
 {
-    SDL_Rect labelDst;
     SDL_Rect textDst;
+    int texWidth;
+    int texHeight;
+    SDL_QueryTexture(label->textTexture, NULL, NULL, &texWidth, &texHeight);
 
-    labelDst.x = (int)label->xPos;
-    labelDst.y = (int)label->yPos;
-    labelDst.w = label->width;
-    labelDst.h = label->height;
+    textDst.x = (int)(label->xPos);
+    textDst.y = (int)(label->yPos);
+    textDst.w = label->width * texWidth;
+    textDst.h = label->height * texHeight;
 
-    textDst.x = (int)(label->xPos + label->padding);
-    textDst.y = (int)(label->yPos + label->padding);
-    textDst.w = label->width - label->padding;
-    textDst.h = label->height - label->padding;
-
-    SDL_SetRenderDrawColor(getRenderer(), label->backgroundColor.r, label->backgroundColor.g, label->backgroundColor.b, label->backgroundColor.a);
-    SDL_RenderFillRect(getRenderer(), &labelDst);
     SDL_RenderCopy(getRenderer(), label->textTexture, NULL, &textDst);
 }
 
@@ -69,11 +62,12 @@ Button * createButton(double x, double y, int width, int height, int padding, ch
     button->yPos = y;
     button->width = width;
     button->height = height;
-    button->padding = padding;
     button->backgroundColor = backgroundColor;
     button->secondaryBackgroundColor = secondaryBackgroundColor;
     button->textColor = textColor;
     button->onClickAction = onClickAction;
+
+    button->textTexture = createTextureFromText(text, FONT_PATH, button->textColor);
 
     return button;
 }
@@ -118,21 +112,21 @@ void renderButton(Button * button)
     buttonDst.w = button->width;
     buttonDst.h = button->height;
 
-    textDst.x = (int)(button->xPos + button->padding);
-    textDst.y = (int)(button->yPos + button->padding);
-    textDst.w = button->width  - (button->padding * 2);
-    textDst.h = button->height - (button->padding * 2);
+    textDst.x = (int)(button->xPos);
+    textDst.y = (int)(button->yPos);
+    textDst.w = button->width;
+    textDst.h = button->height;
 
     switch (button->hovered)
     {
-        case 0:
+        case 1:
             SDL_SetRenderDrawColor(getRenderer(), button->secondaryBackgroundColor.r, button->secondaryBackgroundColor.g, button->secondaryBackgroundColor.b, button->secondaryBackgroundColor.a);
             SDL_RenderFillRect(getRenderer(), &buttonDst);
             SDL_RenderCopy(getRenderer(), button->textTexture, NULL, &textDst);
             break;
 
-        case 1:
-            SDL_SetRenderDrawColor(getRenderer(), button->secondaryBackgroundColor.r, button->secondaryBackgroundColor.g, button->secondaryBackgroundColor.b, button->secondaryBackgroundColor.a);
+        case 0:
+            SDL_SetRenderDrawColor(getRenderer(), button->backgroundColor.r, button->backgroundColor.g, button->backgroundColor.b, button->backgroundColor.a);
             SDL_RenderFillRect(getRenderer(), &buttonDst);
             SDL_RenderCopy(getRenderer(), button->textTexture, NULL, &textDst);
             break;
