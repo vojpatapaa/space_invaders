@@ -44,6 +44,7 @@ SDL_Renderer * getRenderer();
 SDL_Window * get_window();
 
 void initGameSessionWithoutTank();
+void initMenuSession();
 
 void initGame(const char * windowLabel, int winWidth, int winHeight, int initialFPS, SDL_Color backgroundColor);
 

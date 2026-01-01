@@ -14,17 +14,24 @@ const char * GENERAL_BUBAK_TEXTURE_PATH = "assets/bubak/textures/bubak1.png";
 SDL_Texture * explodedTexture;
 const char * EXPLODED_BUBAK_TEXTURE_PATH = "assets/bubak/textures/explosion.png";
 
+Mix_Chunk * bubakDamage;
+const char * BUBAK_DAMAGE_SFX_PATH = "assets/bubak/sfx/bubak_damage.wav";
+
 void initBubakModule()
 {
     soliderSpriteSheet = createSpriteSheet(SOLIDER_BUBAK_TEXTURE_PATH, 12, 8, 2);
     commanderSpriteSheet = createSpriteSheet(COMMANDER_BUBAK_TEXTURE_PATH, 11, 8, 2);
     generalSpriteSheet = createSpriteSheet(GENERAL_BUBAK_TEXTURE_PATH, 8, 8, 2);
     explodedTexture = createTextureFromImage(EXPLODED_BUBAK_TEXTURE_PATH);
+
+    bubakDamage = Mix_LoadWAV(BUBAK_DAMAGE_SFX_PATH);
 }
 
 
 void quitBubakModule()
 {
+    Mix_FreeChunk(bubakDamage);
+
     destroySpriteSheet(soliderSpriteSheet);
     destroySpriteSheet(commanderSpriteSheet);
     destroySpriteSheet(generalSpriteSheet);
@@ -131,6 +138,7 @@ void updateBubak(Bubak * bubak)
             bubak->alive = 0;
             bubak->type = BUBAK_TYPE_EXPLODED;
             destroyProjectile(shot);
+            Mix_PlayChannel(-1, bubakDamage, 0);
         }   
     }
 }

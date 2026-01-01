@@ -44,6 +44,9 @@ typedef struct
     Direction direction;
 }BubakGroup;
 
+void initBubakGroupModule();
+void quitBubakGroupModule();
+
 int getAliveBubaks(BubakGroup * bubakGroup);
 Bubak * getLeadingRightBubak(BubakGroup * bubakGroup);
 Bubak * getLeadingLeftBubak(BubakGroup * bubakGroup);

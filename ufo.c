@@ -7,13 +7,23 @@
 SDL_Texture * ufoTexture;
 const char * UFO_TEXTURE_PATH= "assets/ufo/textures/ufo.png";
 
+Mix_Music * ufoFlying;
+const char * UFO_FLYING_SFX_PATH = "assets/ufo/sfx/ufo.wav";
+
+Mix_Chunk * ufoDamage;
+const char * UFO_DAMAGE_SFX_PATH = "assets/ufo/sfx/ufo_damage.wav";
+
 void initUfoModule()
 {
     ufoTexture = createTextureFromImage(UFO_TEXTURE_PATH);
+    ufoFlying = Mix_LoadMUS(UFO_FLYING_SFX_PATH);
+    ufoDamage = Mix_LoadWAV(UFO_DAMAGE_SFX_PATH);
 }
 
 void quitUfoModule()
 {
+    Mix_FreeChunk(ufoDamage);
+    Mix_FreeMusic(ufoFlying);
     SDL_DestroyTexture(ufoTexture);
 }
 
@@ -42,9 +52,10 @@ void updateUfo(Ufo * ufo)
     Uint64 currentTime = SDL_GetPerformanceCounter();
     int elapsedTime = (currentTime - ufo->lastFlyTime) / (double)SDL_GetPerformanceFrequency() * 1000;
 
-    if(elapsedTime >= ufo->delay)
+    if(elapsedTime >= ufo->delay && ufo->fly == 0)
     {
         ufo->fly = 1;
+        Mix_FadeInMusic(ufoFlying, 0, 2000);
     }
 
     if(ufo->fly)
@@ -58,6 +69,7 @@ void updateUfo(Ufo * ufo)
                     ufo->fly = 0;
                     ufo->direction = UFO_DIRECTION_LEFT;
                     ufo->lastFlyTime = SDL_GetPerformanceCounter();
+                    Mix_FadeOutMusic(2000);
                 }
                 break;
 
@@ -68,6 +80,7 @@ void updateUfo(Ufo * ufo)
                     ufo->fly = 0;
                     ufo->direction = UFO_DIRECTION_RIGHT;
                     ufo->lastFlyTime = SDL_GetPerformanceCounter();
+                    Mix_FadeOutMusic(2000);
                 }
                 break;
             
@@ -97,6 +110,7 @@ void updateUfo(Ufo * ufo)
         {
             destroyProjectile(shot);
             addToScore(20);
+            Mix_PlayChannel(-1, ufoDamage, 0);
         }
 
     }

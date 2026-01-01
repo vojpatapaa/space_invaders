@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include "game.h"
 #include "textureManager.h"
+#include "bubakGroup.h"
 
 #define TANK_PROJECTILE_SPEED 600
 #define TANK_PROJECTILE_WIDTH 4
@@ -30,7 +31,7 @@ void quitTankModule();
 
 Tank createTank(double x, double y, int tankWidth, int tankHeight, int miliShootDelay);
 
-void updateTank(Tank * tank);
+void updateTank(Tank * tank, BubakGroup * bubakGroup);
 void renderTank(Tank * tank);
 
 

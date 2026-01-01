@@ -18,10 +18,13 @@
 SDL_Window * window;
 SDL_Renderer * renderer;
 SDL_Texture * canvas;
+SDL_Texture * insturctions;
+SDL_Rect insturctionsDst = {380, 120, 459, 270};
 SDL_Color background;
 
 int running;
 GamePart currentGamePart;
+int highestScore;
 
 double desiredMaxMilPerFrame;
 double deltaTime;
@@ -32,7 +35,6 @@ MouseState mouseState;
 /*Game objects*/
 Tank playerTank;
 BubakGroup enemyArmy;
-Mix_Music * chopin;
 Shield shield1;
 Shield shield2;
 Shield shield3;
@@ -51,6 +53,10 @@ Button * set20FpsButton;
 Label * bestScoreLabel;
 Label * bestScoreNumberLabel;
 Label * currentScoreLabel;
+
+/*sfx*/
+Mix_Chunk * clickSfx;
+Mix_Chunk * gameOverSfx;
 
 void setDesiredFPS(int fps)
 {
@@ -182,7 +188,13 @@ void initGameSessionWithoutTank()
 
     setCurrentGamePart(GAME_PART_PLAY);
 
-    setScore(0);
+
+}
+
+void initMenuSession()
+{
+    highestScore = loadScore();
+    Mix_PlayChannel(-1, gameOverSfx, 0);
 }
 
 void initGame(const char * windowLabel, int winWidth, int winHeight, int initialFPS, SDL_Color backgroundColor)
@@ -242,10 +254,6 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
         exit(-1);
     }
 
-    if(SDL_SetHint(SDL_HINT_SHUTDOWN_DBUS_ON_QUIT, "1") == SDL_TRUE)
-    {
-        printf("yes");
-    }
     setDesiredFPS(initialFPS);
 
     background = backgroundColor;
@@ -263,10 +271,10 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
         exit(-1);
     }
 
+    insturctions = createTextureFromImage("assets/ui/space_invaders_instructions.png");
+
     setRunning(1);
     setCurrentGamePart(GAME_PART_MENU);
-
-    chopin = Mix_LoadMUS("assets/tank/sfx/chopin.wav");
 
     int loadedScore = loadScore();
     setScore(loadedScore);
@@ -275,6 +283,8 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
     initTankModule();
     initBubakModule();
     initProjectileModule();
+    initBubakGroupModule();
+    initShieldModule();
 
     /*UI*/
     SDL_Color uiBackgroundColor = {59, 130, 246, 255};
@@ -296,11 +306,16 @@ void initGame(const char * windowLabel, int winWidth, int winHeight, int initial
     bestScoreNumberLabel = createLabel(700, 450, 1.0, 1.0, scoreBuffer, uiTextColor);
     currentScoreLabel = createLabel(10.0, 10.0, 1.0, 1.0, "0", uiTextColor);
 
+    /*sfx*/
+    clickSfx = Mix_LoadWAV("assets/ui/click.wav");
+    gameOverSfx = Mix_LoadWAV("assets/ui/game_over.wav");
+
 
     mouseState.leftClicked = 0;
     mouseState.x = 0;
     mouseState.y = 0;
 
+    highestScore = loadScore();
 
 }
 
@@ -347,20 +362,22 @@ void update()
             updateButton(set30FpsButton);
             updateButton(set20FpsButton);
 
-            score = getScore();
-            sprintf(buffer, "%d", score);
+            sprintf(buffer, "%d", highestScore);
             updateLabelText(bestScoreNumberLabel, buffer);
+            if(mouseState.leftClicked)
+            {
+                Mix_PlayChannel(-1, clickSfx, 0);
+            }
 
             break;
 
         case GAME_PART_PLAY:
-            updateTank(&playerTank);
+            updateTank(&playerTank, &enemyArmy);
             updateBubakGroup(&enemyArmy);
-            updateProjectiles();
-            updateShield(&shield1);
-            updateShield(&shield2);
-            updateShield(&shield3);
-            updateShield(&shield4);
+            updateShield(&shield1, &enemyArmy);
+            updateShield(&shield2, &enemyArmy);
+            updateShield(&shield3, &enemyArmy);
+            updateShield(&shield4, &enemyArmy);
 
             score = getScore();
             sprintf(buffer, "Score: %d", score);
@@ -372,6 +389,8 @@ void update()
         default:
             break;
     }
+
+    updateProjectiles();
 
 }
 
@@ -395,6 +414,7 @@ void render()
             renderButton(set20FpsButton);
             renderLabel(bestScoreLabel);
             renderLabel(bestScoreNumberLabel);
+            SDL_RenderCopy(getRenderer(), insturctions, NULL, &insturctionsDst);
             break;
 
         case GAME_PART_PLAY:
@@ -424,8 +444,23 @@ void render()
 void clearGame()
 {
 
-    Mix_FreeMusic(chopin);
+    Mix_FreeChunk(gameOverSfx);
+    Mix_FreeChunk(clickSfx);
 
+    destroyLabel(gameLabel);
+    destroyButton(playButton);
+    destroyButton(toggleDarkModeButton);
+    destroyButton(exitGameButton);
+    destroyButton(set120FpsButton);
+    destroyButton(set60FpsButton);
+    destroyButton(set30FpsButton);
+    destroyButton(set20FpsButton);
+    destroyLabel(bestScoreLabel);
+    destroyLabel(bestScoreNumberLabel);
+    destroyLabel(currentScoreLabel);
+
+    quitShieldModule();
+    quitBubakGroupModule();
     quitUfoModule();
     quitProjectileModule();
     quitBubakModule();

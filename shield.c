@@ -2,6 +2,24 @@
 #include "projectile.h"
 #include "game.h"
 
+Mix_Chunk * shieldDamage;
+const char * SHIELD_DAMAGE_SFX_PATH = "assets/shield/sfx/shield_damage.wav";
+
+Mix_Chunk * shieldDestroyed;
+const char * SHIELD_DESTROYED_SFX_PATH = "assets/shield/sfx/shield_destroyed.wav";
+
+void initShieldModule()
+{
+    shieldDamage = Mix_LoadWAV(SHIELD_DAMAGE_SFX_PATH);
+    shieldDestroyed = Mix_LoadWAV(SHIELD_DESTROYED_SFX_PATH);
+}
+
+void quitShieldModule()
+{
+    Mix_FreeChunk(shieldDestroyed);
+    Mix_FreeChunk(shieldDamage);
+}
+
 Shield createShield(double x, double y, SDL_Color backgroundColor)
 {
     Shield shield;
@@ -44,10 +62,11 @@ Shield createShield(double x, double y, SDL_Color backgroundColor)
 }
 
 
-void updateShield(Shield * shield)
+void updateShield(Shield * shield, BubakGroup * bubakGroup)
 {
     SDL_Rect blockDst;
     SDL_Rect shotDst;
+    SDL_Rect bubakDst;
     dynarray * shots = getShots();
     ShieldBlock * arr[BLOCK_COUNT];
     arr[0] = &shield->leftStand;
@@ -76,10 +95,37 @@ void updateShield(Shield * shield)
             {
                 destroyProjectile(shot);
                 arr[i]->lifes--;
+                if(arr[i]->lifes > 0)
+                {
+                    Mix_PlayChannel(-1, shieldDamage, 0);
+                }
+                else
+                {
+                    Mix_PlayChannel(-1, shieldDestroyed, 0);
+                }
+            }
+        }
+
+        for (int j = 0; j < BUBAK_ROWS; j++)
+        {
+            for (int k = 0; k < BUBAK_COLUMNS; k++)
+            {
+                Bubak bubak = bubakGroup->bubaks[j][k];
+                bubakDst.x = (int)bubak.xPos;
+                bubakDst.y = (int)bubak.yPos;
+                bubakDst.w = bubak.width;
+                bubakDst.h = bubak.height;
+                
+                if(bubak.type != BUBAK_TYPE_DEAD && bubak.type != BUBAK_TYPE_EXPLODED && SDL_HasIntersection(&bubakDst, &blockDst))
+                {
+                    arr[i]->lifes = 0;
+                    Mix_PlayChannel(-1, shieldDestroyed, 0);
+                }
             }
         }
         
     }
+    
     
 }
 

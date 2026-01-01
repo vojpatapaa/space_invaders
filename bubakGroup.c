@@ -2,6 +2,9 @@
 #include "projectile.h"
 #include "scoreManager.h"
 
+Mix_Chunk * bubakShoot;
+const char * BUBAK_SHOOT_SFX_PATH = "assets/bubak/sfx/bubak_shoot.wav";
+
 int getAliveBubaks(BubakGroup * bubakGroup)
 {
     int aliveCount = 0;
@@ -52,6 +55,16 @@ Bubak * getLeadingLeftBubak(BubakGroup * bubakGroup)
     }
 
     return NULL;
+}
+
+void initBubakGroupModule()
+{
+    bubakShoot = Mix_LoadWAV(BUBAK_SHOOT_SFX_PATH);
+}
+
+void quitBubakGroupModule()
+{
+    Mix_FreeChunk(bubakShoot);
 }
 
 BubakGroup createBubakGroup(int minDelayMs, int maxDelayMs, int paddingg, int bubakWidthh, int bubakHeightt)
@@ -133,8 +146,13 @@ void updateBubakGroup(BubakGroup * bubakGroup)
     if(aliveBubaks == 0)
     {
         int score = getScore();
+        if(score > loadScore())
+        {
+            setScore(score);
+            saveScore();
+        }
         initGameSessionWithoutTank();
-        setScore(score);
+        initMenuSession();
         return;
     }
     
@@ -252,6 +270,7 @@ void updateBubakGroup(BubakGroup * bubakGroup)
                     double x = (int)bubakGroup->bubaks[i][j].xPos + bubakGroup->bubakWidth/2.0;
                     double y = (int)bubakGroup->bubaks[i][j].yPos + bubakGroup->bubakHeight;
                     createProjectile(x, y, BUBAK_PROJECTILE_WIDTH, BUBAK_PROJECTILE_HEIGHT, PROJECTILE_TYPE_ENEMY, BUBAK_PROJECTILE_SPEED);
+                    Mix_PlayChannel(-1, bubakShoot, 0);
                 }
             }
             

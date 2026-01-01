@@ -12,16 +12,24 @@ SDL_Color uiTextColor = {30, 64, 175, 255};
 SDL_Texture * tankTexture = NULL;
 const char * TANK_TEXTURE_PATH = "assets/tank/textures/tank.png";
 Label * lifesLabel;
+Mix_Chunk * tankDamage;
+const char * TANK_DAMAGE_PATH = "assets/tank/sfx/tank_damage.wav";
+Mix_Chunk * tankLaserShot;
+const char * TANK_LASER_SHOT_PATH = "assets/tank/sfx/tank_laser_shot.wav";
 
 
 void initTankModule()
 {
     tankTexture = createTextureFromImage(TANK_TEXTURE_PATH);
     lifesLabel = createLabel(930.0, 10.0, 1.2, 1.2, "3", uiTextColor);
+    tankDamage = Mix_LoadWAV(TANK_DAMAGE_PATH);
+    tankLaserShot = Mix_LoadWAV(TANK_LASER_SHOT_PATH);
 }
 
 void quitTankModule()
 {
+    Mix_FreeChunk(tankLaserShot);
+    Mix_FreeChunk(tankDamage);
     destroyLabel(lifesLabel);
     SDL_DestroyTexture(tankTexture);
 }
@@ -44,7 +52,7 @@ Tank createTank(double x, double y, int tankWidth, int tankHeight, int miliShoot
     return tank;
 }
 
-void updateTank(Tank * tank)
+void updateTank(Tank * tank, BubakGroup * bubakGroup)
 {
     //ovladani pomoci vstupu
     if(tank->activeInput)
@@ -67,13 +75,15 @@ void updateTank(Tank * tank)
             {
                 tank->lastShootTime = currentTime;
                 createProjectile(tank->xPos + tank->width/2.0, tank->yPos, TANK_PROJECTILE_WIDTH, TANK_PROJECTILE_HEIGHT, PROJECTILE_TYPE_TANK, TANK_PROJECTILE_SPEED);
+                Mix_PlayChannel(-1, tankLaserShot, 0);
             }
         }
     }
 
-    //kolize s nepratelkskymi strelami
+    //kolize s nepratelkskymi strelami && bubaky
     SDL_Rect tankDst;
     SDL_Rect shotDst;
+    SDL_Rect bubakDst;
     dynarray * shots = getShots();
     int count = shots->size;
 
@@ -94,9 +104,37 @@ void updateTank(Tank * tank)
         {
             tank->lives = tank->lives - 1;
             destroyProjectile(projectile);
+            Mix_PlayChannel(-1, tankDamage, 0);
             break;
         }
     }
+
+    for (int i = 0; i < BUBAK_ROWS; i++)
+    {
+        int broken = 0;
+        for (int j = 0; j < BUBAK_COLUMNS; j++)
+        {
+            Bubak bubak = bubakGroup->bubaks[i][j];
+            bubakDst.x = (int)bubak.xPos;
+            bubakDst.y = (int)bubak.yPos;
+            bubakDst.w = bubak.width;
+            bubakDst.h = bubak.height;
+
+            if(bubak.type != BUBAK_TYPE_DEAD && bubak.type != BUBAK_TYPE_EXPLODED && SDL_HasIntersection(&bubakDst, &tankDst))
+            {
+                tank->lives = 0;
+                broken = 1;
+                break;
+            }
+
+            if(broken)
+            {
+                break;
+            }
+        }
+        
+    }
+    
     
 
     if(tank->xPos < 0 )
@@ -117,6 +155,7 @@ void updateTank(Tank * tank)
             saveScore();
         }
         setCurrentGamePart(GAME_PART_MENU);
+        initMenuSession();
     }
 
     char buffer[20];

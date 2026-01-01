@@ -2,6 +2,7 @@
 #define SPACE_INVADERS_SHILED_H
 
 #include <SDL2/SDL.h>
+#include "bubakGroup.h"
 
 #define CUBE_WIDTH 18
 #define CUBE_HEIGHT 18
@@ -31,8 +32,11 @@ typedef struct
     ShieldBlock rightStand;
 }Shield;
 
+void initShieldModule();
+void quitShieldModule();
+
 Shield createShield(double x, double y, SDL_Color backgroundColor);
-void updateShield(Shield * shield);
+void updateShield(Shield * shield, BubakGroup * bubakGroup);
 void renderShield(Shield * shield);
 
 
