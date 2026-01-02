@@ -152,7 +152,7 @@ void updateBubakGroup(BubakGroup * bubakGroup)
             saveScore();
         }
         initGameSessionWithoutTank();
-        initMenuSession();
+        //initMenuSession();
         return;
     }
     

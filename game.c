@@ -194,6 +194,8 @@ void initGameSessionWithoutTank()
 void initMenuSession()
 {
     highestScore = loadScore();
+    Mix_HaltChannel(-1);
+    Mix_HaltMusic();
     Mix_PlayChannel(-1, gameOverSfx, 0);
 }
 

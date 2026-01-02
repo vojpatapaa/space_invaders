@@ -126,11 +126,11 @@ void updateTank(Tank * tank, BubakGroup * bubakGroup)
                 broken = 1;
                 break;
             }
+        }
 
-            if(broken)
-            {
-                break;
-            }
+        if(broken)
+        {
+            break;
         }
         
     }
