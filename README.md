@@ -3,15 +3,17 @@
 Re-creation of classic arcade game from 1978 using C language and SDL2 framework.
 
 ## Program's compilation and launch on Ubuntu
-1. Firstly you have to create a repository where the program will compile and run. You can do so by typing `mkdir build` into command-line.
+1. Firstly you have to download SDL libraries. You can use `sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev` command.
 
-2. Assets folder needs to be in same directory as program. You can either copy the assets directory into build directory by typing `cp -r assets build` or move the assets directory into build directory by `mv assets build` command.
+2. Secondly you have to create a repository where the program will compile and run. You can do so by typing `mkdir build` into command-line.
 
-3. Set build directory as work directory by `cd build` command. Use `cmake ..` command to generate makefile file.
+3. Assets folder needs to be in same directory as program. You can either copy the assets directory into build directory by typing `cp -r assets build` or move the assets directory into build directory by `mv assets build` command.
 
-4. Use `make` command to compile program. After this step you should see "space_invaders" file in build directory.
+4. Set build directory as work directory by `cd build` command. Use `cmake ..` command to generate makefile file.
 
-5. type `./space_invaders` into command-line to launch the program.
+5. Use `make` command to compile program. After this step you should see "space_invaders" file in build directory.
+
+6. type `./space_invaders` into command-line to launch the program.
 
 ## Code
 Each module represents one game object. Most of game objects have 2 function - `update()` function and `render()` function. `update()` function is used to calculate object's position, collision with other game objects and basically whole logic of game. `render()` function is just used to copy textures into buffer.
