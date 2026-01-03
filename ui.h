@@ -1,7 +1,7 @@
 #ifndef SPACE_UI_H
 #define SPACE_UI_H
 
-#include "SDL2/SDL.h"
+#include <SDL2/SDL.h>
 
 typedef struct
 {

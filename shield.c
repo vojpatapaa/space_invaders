@@ -116,7 +116,7 @@ void updateShield(Shield * shield, BubakGroup * bubakGroup)
                 bubakDst.w = bubak.width;
                 bubakDst.h = bubak.height;
                 
-                if(bubak.type != BUBAK_TYPE_DEAD && bubak.type != BUBAK_TYPE_EXPLODED && SDL_HasIntersection(&bubakDst, &blockDst))
+                if(bubak.type != BUBAK_TYPE_DEAD && bubak.type != BUBAK_TYPE_EXPLODED && arr[i]->lifes > 0 && SDL_HasIntersection(&bubakDst, &blockDst))
                 {
                     arr[i]->lifes = 0;
                     Mix_PlayChannel(-1, shieldDestroyed, 0);
